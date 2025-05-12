@@ -3,6 +3,7 @@ import { ref, h, onMounted } from 'vue';
 import axios from 'axios';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import Button from '@/components/ui/button/Button.vue';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -11,102 +12,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { handleError, handleSucess } from '@/lib/utils';
+import type { Authorize } from '@/interfaces';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as z from 'zod';
+import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
+import { useAuthorizeStore } from '@/stores/authorizeStore';
+import { useRoleStore } from '@/stores/roleStore';
 
-// Danh sách nhân viên, quyền, và phân quyền
-const phanQuyenList = ref([]);
-const taiKhoanList = ref([]);
-const quyenList = ref([]);
-const editMode = ref(false);
+const store = useAuthorizeStore();
 
-// Dữ liệu form
-const form = ref({
-  ma_phan_quyen:'',
-  ma_nhan_vien: '',
-  ma_quyen: ''
+const roleStore = useRoleStore();
+
+
+
+onMounted(async () => {
+  await roleStore.getRoles();
+  setValues({
+    roleId: roleStore.roles[0].id.toString()
+  })
+  await store.getAuthorizes();
 });
+const formSchema = toTypedSchema(z.object({
+  employeeId : z.string().min(1,{
+    message : "Mã nhân viên không được để trống"
+  }).default("1"),
+  roleId: z.string().min(1,{
+    message : "Tên quyền không được để trống"
+  }).default(""),
+}));
 
-// 🛠 Lấy danh sách phân quyền từ API
-const fetchPhanQuyen = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/phan_quyens');
-    phanQuyenList.value = response.data;
-  } catch (error) {
-    handleError(error);
+const {handleSubmit, values, setValues } = useForm(
+  {
+    validationSchema: formSchema,
   }
-};
+);
+const onSubmit = handleSubmit(async () =>{
+  await store.authorize(values);
+})
 
-// 🛠 Lấy danh sách tài khoản (nhân viên)
-const fetchTaiKhoan = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/tai_khoans');
-    taiKhoanList.value = response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 🛠 Lấy danh sách quyền
-const fetchQuyen = async () => {
-  try {
-    const response = await axios.get('http://localhost:8000/api/quyens');
-    quyenList.value = response.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 🛠 Gửi dữ liệu (Thêm / Sửa phân quyền)
-const onSubmit = async () => {
-  try {
-    if (editMode.value) {
-      await axios.put(`http://localhost:8000/api/phan_quyens/${form.value.ma_phan_quyen}`, form.value);
-    } else {
-      await axios.post('http://localhost:8000/api/phan_quyens', form.value);
-    }
-    handleSucess("Thành công","Phân quyền thành công");
-    clearData();
-    fetchPhanQuyen();
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// 🛠 Xóa phân quyền
-const deletePhanQuyen = async (id: number) => {
-  if (confirm('Bạn có chắc chắn muốn xóa phân quyền này?')) {
-    try {
-      await axios.delete(`http://localhost:8000/api/phan_quyens/${id}`);
-      handleSucess("Thành công","Hủy phân quyền thành công");
-      fetchPhanQuyen();
-    } catch (error) {
-      handleError(error);
-    }
-  }
-};
-
-// 🛠 Xóa dữ liệu form
-const clearData = () => {
-  editMode.value = false;
-  form.value = { 
-    ma_phan_quyen: '', // ✅ Đặt lại giá trị khi hủy
-    ma_nhan_vien: '', 
-    ma_quyen: ''
-  };
-};
-
-// 🛠 Load dữ liệu khi component được tạo
-onMounted(() => {
-  fetchPhanQuyen();
-  fetchTaiKhoan();
-  fetchQuyen();
-});
-
-// 🛠 Cấu hình cột cho DataTable
-const columns: ColumnDef<any>[] = [
-  { accessorKey: 'ten_nhan_vien', header: '' }, 
-  { accessorKey: 'chuc_vu', header: 'Chức vụ' },
-  { accessorKey: 'ten_quyen', header: 'Tên quyền' },
+const columns: ColumnDef<Authorize>[] = [
+  { accessorKey: 'id', header: 'Mã phân quyền' }, 
+  { accessorKey: 'employeeName', header: 'Tên nhân viên',cell : ({row}) => row.original.employee.name }, 
+  { accessorKey: 'roleName', header: 'Tên quyền',cell : ({row}) => row.original.role.roleName },
   {
     accessorKey: 'action',
     header: 'Hành động',
@@ -116,24 +64,8 @@ const columns: ColumnDef<any>[] = [
         h(
           Button,
           {
-            variant: 'outline',
-            class: 'mr-2',
-            onClick: () => {
-              editMode.value = true;
-              form.value = {
-                ma_phan_quyen: row.original.ma_phan_quyen, 
-                ma_nhan_vien: row.original.ma_nhan_vien,
-                ma_quyen: row.original.ma_quyen
-              };
-            }
-          },
-          () => 'Sửa'
-        ),
-        h(
-          Button,
-          {
             variant: 'destructive',
-            onClick: () => deletePhanQuyen(row.original.ma_phan_quyen)
+            onClick: async () => await store.removeAuthorize({roleId : row.original.role.id,employeeId : row.original.employee.id})
           },
           () => 'Xóa'
         )
@@ -145,45 +77,42 @@ const columns: ColumnDef<any>[] = [
 
 <template>
   <div>
-    <h2 class="text-lg font-bold mb-4">Quản lý Phân Quyền</h2>
-
+    <page-header title="Quản lý phân quyền"></page-header>
     <form class="w-full grid grid-cols-2 mb-10 gap-5" @submit.prevent="onSubmit">
-      <div>
-        <label for="ma_nhan_vien" class="block text-sm font-medium">Tên nhân viên</label>
-        <Select v-model="form.ma_nhan_vien">
-          <SelectTrigger>
-            <SelectValue placeholder="Chọn nhân viên" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem v-for="tk in taiKhoanList" :key="tk.ma_nhan_vien" :value="tk.ma_nhan_vien">
-                {{ tk.chuc_vu }}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+      <div class="grid gap-y-2">
+        <FormField v-slot="{ componentField }" name="employeeId">
+            <FormItem class="mb-4">
+              <FormLabel>Mã nhân viên</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Mã nhân viên" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
-
-      <div>
-        <label for="ma_quyen" class="block text-sm font-medium">Tên quyền</label>
-        <Select v-model="form.ma_quyen">
-          <SelectTrigger>
-            <SelectValue placeholder="Chọn quyền" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem v-for="quyen in quyenList" :key="quyen.ma_quyen" :value="quyen.ma_quyen">
-                {{ quyen.ten_quyen }}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+      <div class="grid gap-y-2">
+        <FormField v-slot="{ componentField }" name="roleId">
+            <FormItem class="mb-4">
+              <FormLabel>Quyền</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger>
+                    <SelectValue  />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem :value="role.id.toString()" v-for="role in roleStore.roles" :key="role.id">{{ role.roleName }}</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
+      <Button type="submit">Thêm quyền</Button>
+      </form>
 
-      <Button type="submit" class="col-span-2">{{ editMode ? "Cập nhật" : "Thêm mới" }}</Button>
-      <Button v-if="editMode" @click="clearData">Hủy</Button>
-    </form>
-
-    <DataTable :columns="columns" :data="phanQuyenList" search="ten_nhan_vien"></DataTable>
+    <DataTable :columns="columns" :data="store.authorizes"></DataTable>
   </div>
 </template>

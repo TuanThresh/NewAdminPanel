@@ -7,21 +7,27 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
 import { useRouter } from 'vue-router';
+import { useEmployeeStore } from '@/stores/employeeStore';
 const router = useRouter();
 const formSchema = toTypedSchema(z.object({
-  password: z.string().min(8,{
-    message : "Password must be at least 8 characters"
-  }).default("hongtham1602"),
+  password: z.string().min(3,{
+    message : "Password must be at least 3 characters"
+  }).default("123"),
   email: z.string().email({
     message : "Email must end with @gmail.com"
   }).default("lehoangtuan783@gmail.com"),
 }));
 
+const store = useEmployeeStore();
+
 const form = useForm({
       validationSchema: formSchema,
   });
 
-const onSubmit = form.handleSubmit(() => {
+const onSubmit = form.handleSubmit(async () => {
+
+  await store.loginEmployee(form.values);
+
   router.push({name : 'home'})
 });
 </script>

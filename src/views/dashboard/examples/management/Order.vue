@@ -381,8 +381,8 @@ const deleteOrder = async (id: number) => {
 };
 
 onMounted(async () => {
-  fetchOrders();
-  await fetchServices(); // Lấy danh sách dịch vụ
+  await fetchOrders();
+  await fetchServices();
 });
 
 </script>
@@ -453,7 +453,7 @@ onMounted(async () => {
       </div>
       <div class="grid gap-y-2">
         <Label for="total_price">Tổng tiền</Label>
-        <span class="border p-2 rounded bg-gray-100">{{ form.total_price }}</span>
+        <Input type="text" v-model="form.total_price" disabled/>
       </div>
       <div class="grid gap-y-2">
         <label for="status" class="block text-sm font-medium">Trạng thái </label>

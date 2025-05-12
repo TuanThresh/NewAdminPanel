@@ -37,11 +37,11 @@ const router = createRouter({
           } as RouteMeta & IRouteMeta
         },
         {
-          path: 'user',
-          name: 'user',
+          path: 'employee',
+          name: 'employee',
           component: () => import('@/views/dashboard/examples/system/Employee.vue'),
           meta: {
-            title: 'User',
+            title: 'Employee',
           } as RouteMeta & IRouteMeta
         },
         {
@@ -80,7 +80,7 @@ const router = createRouter({
         {
           path: 'domain',
           name: 'domain',
-          component: () => import('@/views/dashboard/examples/service/Domain.vue'),
+          component: () => import('@/views/dashboard/examples/service/DomainProduct.vue'),
           meta: {
             title: 'Domain',
           } as RouteMeta & IRouteMeta
@@ -102,11 +102,11 @@ const router = createRouter({
           } as RouteMeta & IRouteMeta
         },
         {
-          path: 'account-domain',
-          name: 'accountDomain',
+          path: 'domain-account',
+          name: 'Tài khoản miền',
           component: () => import('@/views/dashboard/examples/account/DomainAccount.vue'),
           meta: {
-            title: 'AccountDomain',
+            title: 'Tài khoản miền',
           } as RouteMeta & IRouteMeta
         },
         {
@@ -120,9 +120,17 @@ const router = createRouter({
         {
           path: 'customer',
           name: 'Customer',
-          component: () => import('@/views/dashboard/examples/management/User.vue'),
+          component: () => import('@/views/dashboard/examples/management/Customer.vue'),
           meta: {
             title: 'Customer',
+          } as RouteMeta & IRouteMeta
+        },
+        {
+          path: 'customer-type',
+          name: 'Customer Type',
+          component: () => import('@/views/dashboard/examples/category/CustomerType.vue'),
+          meta: {
+            title: 'Customer Type',
           } as RouteMeta & IRouteMeta
         },
         {

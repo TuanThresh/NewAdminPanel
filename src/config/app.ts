@@ -19,9 +19,9 @@ export const APP_MENU: Record<string, Menu> = {
     icon: 'Home',
     children: [
       {
-        title: 'Người dùng',
+        title: 'Nhân viên',
         icon: 'User',
-        path: 'user',
+        path: 'employee',
       },
       {
         title: 'Quyền',
@@ -41,14 +41,9 @@ export const APP_MENU: Record<string, Menu> = {
     icon: 'Package',
     children: [
       {
-        title: 'VPS',
-        icon: 'Waypoints',
-        path: 'vps',
-      },
-      {
-        title: 'Hosting',
+        title: 'Tài khoản miền',
         icon: 'Computer',
-        path: 'hosting',
+        path: 'domain-account',
       },
       {
         title: 'Miền',
@@ -59,23 +54,13 @@ export const APP_MENU: Record<string, Menu> = {
   },
 
   account: {
-    name: 'Tài khoản',
+    name: 'Danh mục',
     icon: 'UserCog',
     children: [
-      {
-        title: 'Tài khoản hosting',
-        icon: 'BetweenHorizontalEnd',
-        path: 'account-hosting'
-      },
-      {
-        title: 'Tài khoản domain',
-        icon: 'BetweenHorizontalEnd',
-        path: 'account-domain'
-      },
-      {
-        title: 'Tài khoản vps',
-        icon: 'BetweenHorizontalEnd',
-        path: 'account-vps'
+            {
+        title: 'Loại khách hàng',
+        icon: 'ReceiptText',
+        path: 'customer-type',
       },
 
     ]
@@ -89,11 +74,7 @@ export const APP_MENU: Record<string, Menu> = {
         icon: 'BookUser',
         path: 'customer',
       },
-      {
-        title: 'Hóa đơn',
-        icon: 'ReceiptText',
-        path: 'invoice',
-      },
+
       {
         title: 'Đơn hàng',
         icon: 'ReceiptText',

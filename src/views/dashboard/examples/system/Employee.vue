@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, h, onMounted } from 'vue';
-import axios from 'axios';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import Label from '@/components/ui/label/Label.vue';
 import Button from '@/components/ui/button/Button.vue';
+import { useEmployeeStore } from '@/stores/employeeStore';
 import {
   Select,
   SelectContent,
@@ -14,99 +13,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { handleError, handleSucess } from '@/lib/utils';
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as z from 'zod';
+import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
+import type { Employee, StatusType } from "@/interfaces/index";
+const store = useEmployeeStore();
 
-interface StatusType {
-  tag: string;
-  title: string;
-}
+const formSchema = toTypedSchema(z.object({
+  status: z.string().default("ChoXacThuc"),
+  email: z.string().min(1,{
+    message : "Email không được để trống"
+  }).email({
+    message : "Email phải bao gồm @gmail.com"
+  }).default(""),
+  name: z.string().min(1,{
+    message : "Tên nhân viên không được để trống"
+  }).default(""),
+}));
+
+const {handleSubmit, values, setValues } = useForm(
+  {
+    validationSchema: formSchema,
+  }
+);
+
+const onSubmit = handleSubmit(async () =>{
+  if(editMode.value){
+    await store.editEmployee(values)
+  }
+  else await store.addEmployee(values);
+})
 
 const tagVariants: StatusType[] = [
-  { tag: 'success', title: 'Kích hoạt', value: 'active' },
-  { tag: 'warning', title: 'Khóa', value: 'none' },
+  { tag: 'success', title: 'Kích hoạt', value: 'KichHoat' },
+  { tag: 'warning', title: 'Chờ xác thực', value: 'ChoXacThuc' },
 ];
 
-
-const tasks = ref([]);
 const editMode = ref(false);
-const form = ref({
-  id: undefined, // Sửa ma_nhan_vien -> id
-  chuc_vu: '',
-  status: '1',
-  hoten: '',
-  email: '',
-  password: ''
-});
 
-// Hàm lấy danh sách tài khoản
-const fetchTaiKhoan = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/tai_khoans');
-    tasks.value = response.data.map(nv => ({
-      ma_nhan_vien: nv.ma_nhan_vien,
-      hoten: nv.hoten,
-      email: nv.email,
-      password: nv.password,
-      chuc_vu: nv.chuc_vu,
-      status: nv.status === "Kích hoạt" ? "active" : "none" // Đảm bảo dữ liệu chuẩn hóa
-    }));
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-
-
-const onSubmit = async () => {
-  try {
-    console.log("Dữ liệu gửi lên:", form.value);
-    if (editMode.value) {
-      await axios.put(`http://127.0.0.1:8000/api/tai_khoans/${form.value.ma_nhan_vien}`, {
-        ...form.value,
-      });
-      handleSucess("Thành công","Sửa tài khoản thành công");
-    } else {
-      await axios.post('http://127.0.0.1:8000/api/tai_khoans', {
-        ...form.value,
-      });
-      handleSucess("Thành công","Thêm tài khoản thành công");
-    }
-    clearData();
-    fetchTaiKhoan();
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-
-
-// Xóa tài khoản
-const deleteTaiKhoan = async (id: number) => {
-  if (confirm('Bạn có chắc chắn muốn xóa tài khoản này?')) {
-    try {
-      await axios.delete(`http://127.0.0.1:8000/api/tai_khoans/${id}`);
-      handleSucess("Thành công","Xóa tài khoản thành công");
-      fetchTaiKhoan();
-    } catch (error) {
-      handleError(error);
-    }
-  }
-};
-
-// Xóa dữ liệu form
-const clearData = () => {
-  editMode.value = false;
-  form.value = { id: undefined, chuc_vu: '', status: '1', hoten: '', email: '', password: '' };
-};
-
-onMounted(fetchTaiKhoan);
 
 
 // Cấu hình cột cho DataTable
-const columns: ColumnDef<any>[] = [
-  { accessorKey: 'ma_nhan_vien', header: 'Mã nhân viên' },  // Hiển thị mã nhân viên
-  { accessorKey: 'hoten', header: 'Họ tên' },
-  { accessorKey: 'chuc_vu', header: 'Chức vụ' },
+const columns: ColumnDef<Employee>[] = [
+  { accessorKey: 'id', header: 'Mã nhân viên' },  // Hiển thị mã nhân viên
+  { accessorKey: 'name', header: 'Họ tên' },
+  { accessorKey: 'hasRoles', header: 'Chức vụ' },
   { accessorKey: 'email', header: 'Email' },
   {
   accessorKey: 'status',
@@ -124,56 +76,75 @@ const columns: ColumnDef<any>[] = [
     cell: ({ row }) => h('div', {}, [
       h(Button, {
         variant: "outline",
+        class: 'mr-2',
         onClick: () => {
           editMode.value = true;
-          form.value = { ...row.original };  // Cập nhật form khi sửa
-        }
+          setValues({ ...row.original }); // Cập nhật form khi sửa
+        },
       }, () => "Sửa"),
-      h(Button, { variant: "destructive", onClick: () => deleteTaiKhoan(row.original.ma_nhan_vien) }, () => "Xóa")
+      h(Button, { variant: "destructive", onClick: async() => {
+        await store.deleteEmployee(row.original.id)
+      } }, () => "Xóa")
     ])
   },
 ];
 
+onMounted(async () => {
+  await store.getEmployees();
+})
 </script>
 
 <template>
   <div>
-    <page-header title="Quản lý tài khoản"></page-header>
+    <page-header title="Quản lý nhân viên"></page-header>
     <form class="w-full grid grid-cols-2 mb-10 gap-5" @submit.prevent="onSubmit">
       <div class="grid gap-y-2">
-        <Label for="hoten">Họ tên</Label>
-        <Input type="text" v-model="form.hoten" placeholder="Họ tên" />
+        <FormField v-slot="{ componentField }" name="name">
+            <FormItem class="mb-4">
+              <FormLabel>Họ tên</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Họ tên" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
       <div class="grid gap-y-2">
-        <Label for="email">Email</Label>
-        <Input type="email" v-model="form.email" placeholder="Email" />
+        <FormField v-slot="{ componentField }" name="email">
+            <FormItem class="mb-4">
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="example@mail.com" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
       <div class="grid gap-y-2">
-        <Label for="password">Mật khẩu</Label>
-        <Input type="password" v-model="form.password" placeholder="Mật khẩu" />
+        <FormField v-slot="{ componentField }" name="status">
+            <FormItem class="mb-4">
+              <FormLabel>Trạng thái</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger>
+                    <SelectValue  />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="ChoXacThuc">Chờ xác thực</SelectItem>
+                      <SelectItem value="KichHoat">Kích hoạt</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
-      <div class="grid gap-y-2">
-        <Label for="chuc_vu">Chức vụ</Label>
-        <Input type="text" v-model="form.chuc_vu" placeholder="Chức vụ" />
-      </div>
-      <div class="grid gap-y-2">
-        <Label for="status">Trạng thái</Label>
-        <Select v-model="form.status">
-          <SelectTrigger>
-            <SelectValue :placeholder="form.status === 'active' ? 'Kích hoạt' : 'Khóa'" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="active">Kích hoạt</SelectItem>
-              <SelectItem value="none">Khóa</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-      <Button type="submit" v-if="!editMode">Thêm tài khoản</Button>
-      <Button type="submit" v-if="editMode">Cập nhật</Button>
-      <Button v-if="editMode" @click="clearData">Hủy</Button>
+      <div></div>
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
     </form>
-    <DataTable :columns="columns" :data="tasks"></DataTable>
+    <DataTable :columns="columns" :data="store.employees"></DataTable>
   </div>
 </template>

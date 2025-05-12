@@ -1,0 +1,71 @@
+import type { APIResponse, Role } from "@/interfaces";
+import { defineStore } from "pinia";
+import axios from "@/plugins/axios";
+import { ref } from "vue";
+import { handleError, handleSucess } from "@/lib/utils";
+
+export const useRoleStore = defineStore('roleStore',() => {
+    
+  const role = ref<Role|null>(null);
+
+  const roles = ref<Role[]>([]);
+
+
+  const getRoles = async () => {
+    try {
+      const response = await axios.get<Role[]>("/role") as APIResponse<Role[]>;
+
+      roles.value = response.data;
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+  
+  const addRole = async (form : Record<string,string>) => {
+    try {
+
+      const response = await axios.post("/role",form);
+
+      await getRoles();
+
+      handleSucess(response.status.toString(),response.data)
+
+      return response.data
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const editRole = async (form : Record<string,string>) => {
+    const {id,...dataWithoutId} = form;
+    try {
+      const response = await axios.put(`/role/${id}`,dataWithoutId)
+
+      await getRoles();
+
+      handleSucess(response.status.toString(),response.data)
+
+      return response.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const deleteRole = async (id : string) => {
+    try {
+      const response = await axios.delete(`/role/${id}`)
+
+      await getRoles();
+
+      handleSucess(response.status.toString(),response.data)
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  return {getRoles,addRole,editRole,deleteRole,role,roles};
+})

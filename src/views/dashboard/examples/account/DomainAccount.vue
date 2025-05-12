@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, h } from 'vue';
-import axios from 'axios';
+import { ref, h, onMounted } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import Button from '@/components/ui/button/Button.vue';
 import {
@@ -12,141 +12,106 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { handleError, handleSucess } from '@/lib/utils';
-// Danh sách tài khoản domain
-const domainAccounts = ref([]);
-const domainProducts = ref([]);
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as z from 'zod';
+import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
+import type { DomainAccount} from "@/interfaces/index";
+import { useDomainAccountStore } from '@/stores/domainAccountStore';
 
-// Định nghĩa cột cho bảng hiển thị
-const columns: ColumnDef<any>[] = [
-  { accessorKey: 'id', header: 'Mã tài khoản' },
+
+
+
+const formSchema = toTypedSchema(z.object({
+  registerPanel: z.string().min(1,{
+    message : "Register panel không được để trống"
+  }).default(""),
+  username: z.string().min(1,{
+    message : "Tên tài khoản không được để trống"
+  }).default(""),
+}));
+
+const {handleSubmit, values, setValues } = useForm(
   {
-    accessorKey: 'domain_id',
-    header: 'Tên Domain',
-    cell: ({ row }) => {
-      // Tìm hosting tương ứng trong danh sách hostingProducts
-      const domain = domainProducts.value.find(h => h.id === row.original.domain_id);
-      return domain ? domain.domain_name : 'Không xác định'; // Nếu không tìm thấy, hiển thị 'Không xác định'
-    }
-  },
-  { accessorKey: 'registrar_panel', header: 'Bảng điều khiển' },
-  { accessorKey: 'username', header: 'Tên đăng nhập' },
-  { accessorKey: 'password', header: 'Mật khẩu' },
-  {
-    accessorKey: 'actions',
-    header: 'Hành động',
-    cell: ({ row }) =>
-      h('div', {}, [
-        h(Button, { variant: 'outline', onClick: () => editAccount(row.original) }, 'Sửa'),
-        h(Button, { variant: 'destructive', onClick: () => deleteAccount(row.original.id) }, 'Xóa')
-      ])
+    validationSchema: formSchema,
   }
-];
+);
+const store = useDomainAccountStore();
+const editMode = ref(false);
 
-// Định nghĩa dữ liệu form
-const form = ref({
-  domain_id: '',
-  registrar_panel: '',
-  username: '',
-  password: ''
-});
 
-// Lấy danh sách domain products
-const fetchDomainProducts = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/domain_products');
-    domainProducts.value = response.data;
-    console.log(response.data);
-  } catch (error) {
-    handleError(error);
+
+const onSubmit = handleSubmit(async () =>{
+  if(editMode.value){
+    await store.editDomainAccount(values)
   }
-};
-
-// Lấy danh sách domain accounts từ API
-const fetchDomainAccounts = async () => {
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/domain_accounts');
-    domainAccounts.value = response.data;
-    console.log(response.data);
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// Thêm mới hoặc cập nhật domain account
-const submitForm = async () => {
-  try {
-    if (form.value.id) {
-      await axios.put(`http://127.0.0.1:8000/api/domain_accounts/${form.value.id}`, form.value);
-      handleSucess("Thành công","Sửa tài khoản domain thành công");
-    } else {
-      await axios.post('http://127.0.0.1:8000/api/domain_accounts', form.value);
-      handleSucess("Thành công","Thêm tài khoản domain thành công");
-    }
-    form.value = { domain_id: '', registrar_panel: '', username: '', password: '' };
-    fetchDomainAccounts();
-  } catch (error) {
-    handleError(error);
-  }
-};
-
-// Chỉnh sửa tài khoản domain
-const editAccount = (account) => {
-  form.value = { ...account };
-};
-
-// Xóa tài khoản domain
-const deleteAccount = async (id) => {
-  try {
-    await axios.delete(`http://127.0.0.1:8000/api/domain_accounts/${id}`);
-    fetchDomainAccounts();
-  } catch (error) {
-    handleError(error);
-  }
-};
+  else await store.addDomainAccount(values);
+})
 
 onMounted(async () => {
-  await fetchDomainProducts();
-  await fetchDomainAccounts();
-});
+  await store.getDomainAccounts();
+})
+
+const columns: ColumnDef<DomainAccount>[] = [
+  { accessorKey: 'id', header: 'Mã miền', enableSorting: false },
+  { accessorKey: 'registerPanel', header: 'Register Panel', enableSorting: false },
+  { accessorKey: 'username', header: 'Tên tài khoản', enableSorting: false },
+  {
+    accessorKey: 'action',
+    header: 'Hành động',
+    enableSorting: false,
+    cell: ({ row }) =>
+      h('div', { class: 'flex items-center' }, [
+        h(
+          Button,
+          { variant: 'outline', class: 'mr-2', onClick: () => {
+            editMode.value = true;
+            console.log(row.original)
+            setValues({...row.original})
+          } },
+          () => 'Sửa'
+        ),
+        h(
+          Button,
+          { variant: 'destructive', onClick: async () => await store.deleteDomainAccount(row.original.id.toString()) },
+          () => 'Xóa'
+        ),
+      ]),
+  },
+];
+
 </script>
 
 <template>
   <div>
-    <h1 class="text-lg font-bold mb-4">Quản lý Tài khoản Domain</h1>
-
-    <form @submit.prevent="submitForm" class="grid grid-cols-2 gap-4 mb-6">
-
+    <page-header title="Quản lý tài khoản miền"></page-header>
+    <form class="w-full grid grid-cols-2 mb-10 gap-5" @submit.prevent="onSubmit">
       <div class="grid gap-y-2">
-        <label for="domain_id" class="block text-sm font-medium">Chọn Domain</label>
-        <Select v-model="form.domain_id">
-          <SelectTrigger>
-            <SelectValue placeholder="Chọn domain" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem v-for="domain in domainProducts" :key="domain.id" :value="domain.id">
-                {{ domain.domain_name }}
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <FormField v-slot="{ componentField }" name="registerPanel">
+            <FormItem class="mb-4">
+              <FormLabel>Register Panel</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Register Panel" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
       <div class="grid gap-y-2">
-        <label for="registrar_panel">Bảng điều khiển</label>
-        <Input type="text" id="registrar_panel" v-model="form.registrar_panel" required />
+        <FormField v-slot="{ componentField }" name="username">
+            <FormItem class="mb-4">
+              <FormLabel>Tên người dùng</FormLabel>
+              <FormControl>
+                <Input type="string" placeholder="Tên người dùng" v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+              </FormItem>
+          </FormField>
       </div>
-      <div class="grid gap-y-2">
-        <label for="username">Tên đăng nhập</label>
-        <Input type="text" id="username" v-model="form.username" required />
-      </div>
-      <div class="grid gap-y-2">
-        <label for="password">Mật khẩu</label>
-        <Input type="password" id="password" v-model="form.password" required />
-      </div>
-      <Button type="submit">{{ form.id ? 'Cập nhật' : 'Thêm' }} Tài khoản</Button>
+      
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
     </form>
-
-    <DataTable :columns="columns" :data="domainAccounts"></DataTable>
+    <DataTable :columns="columns" :data="store.domainAccounts"></DataTable>
   </div>
 </template>

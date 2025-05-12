@@ -337,7 +337,7 @@ onMounted(fetchInvoices);
 
 <template>
   <div>
-    <page-header title="Quản lý hóa đơn"></page-header>
+    <h1 class="text-lg font-bold mb-4">Quản lý Hóa Đơn</h1>
 
     <form class="grid grid-cols-2 gap-5 mb-10" @submit.prevent="saveInvoice">
       <div>
