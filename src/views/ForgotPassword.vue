@@ -9,14 +9,13 @@ import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/compo
 import { useRouter } from 'vue-router';
 import { useEmployeeStore } from '@/stores/employeeStore';
 import { RouterLink } from 'vue-router';
+import axios from '@/plugins/axios';
+import { handleError, handleSucess } from "@/lib/utils";
 const router = useRouter();
 const formSchema = toTypedSchema(z.object({
-  password: z.string().min(3,{
-    message : "Mật khẩu phải có ít nhất 3 ký tự"
-  }).default("123"),
   email: z.string().email({
     message : "Email phải có đuôi @gmail.com"
-  }).default("lehoangtuan783@gmail.com"),
+  }).default(""),
 }));
 
 const store = useEmployeeStore();
@@ -27,7 +26,15 @@ const form = useForm({
 
 const onSubmit = form.handleSubmit(async () => {
 
-  await store.loginEmployee(form.values);
+  try {
+    const response = await axios.post("employee/forgot_password",{
+    email: form.values.email
+  })
+  handleSucess(response.status.toString(),response.data)
+  
+  } catch (error) {
+    handleError(error);
+  }
 });
 </script>
 
@@ -35,7 +42,7 @@ const onSubmit = form.handleSubmit(async () => {
   <main class="h-screen w-screen flex items-center justify-center">
     <Card class="max-w-[320px] md:max-w-[400px] w-full">
       <CardHeader>
-        <CardTitle class="text-center">Login</CardTitle>
+        <CardTitle class="text-center">Quên mật khẩu</CardTitle>
       </CardHeader>
       <CardContent>
         <form @submit="onSubmit">
@@ -48,25 +55,16 @@ const onSubmit = form.handleSubmit(async () => {
               <FormMessage />
               </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="password">
-            <FormItem>
-              <FormLabel>Mật khẩu</FormLabel>
-              <FormControl>
-                <Input type="password" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>  
         </form>
       </CardContent>
       <CardFooter class="flex flex-col items-end">
         <RouterLink
-          to="forgot-password"
+          to="login"
           class="text-sm text-blue-600 hover:text-blue-800 hover:underline transition duration-200 mb-3"
         >
-          Quên mật khẩu?
+          Đăng nhập
         </RouterLink>
-        <Button class="w-full" @click="onSubmit">Đăng nhập</Button>
+        <Button class="w-full" @click="onSubmit">Gửi</Button>
       </CardFooter>
     </Card>
   </main>

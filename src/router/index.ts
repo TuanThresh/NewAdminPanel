@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteMeta } from 'vue-router'
 import DashboardLayoutVue from '@/layouts/dashboard.vue';
+import type { Employee } from '@/interfaces';
 
 interface IRouteMeta {
   title: string
@@ -17,7 +18,23 @@ const router = createRouter({
       name: 'login',
       component: () => import('@/views/Login.vue'),
       meta: {
-        title: 'Login',
+        title: 'Đăng nhập',
+      } as RouteMeta & IRouteMeta,
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot password',
+      component: () => import('@/views/ForgotPassword.vue'),
+      meta: {
+        title: 'Quên mật khẩu',
+      } as RouteMeta & IRouteMeta,
+    },
+    {
+      path: '/reset-password',
+      name: 'reset password',
+      component: () => import('@/views/ResetPassword.vue'),
+      meta: {
+        title: 'Đổi mật khẩu',
       } as RouteMeta & IRouteMeta,
     },
     {
@@ -34,6 +51,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/Home.vue'),
           meta: {
             title: 'Home',
+            requiresAuth: true
           } as RouteMeta & IRouteMeta
         },
         {
@@ -42,6 +60,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/system/Employee.vue'),
           meta: {
             title: 'Employee',
+            requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -50,6 +69,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/system/Role.vue'),
           meta: {
             title: 'Role',
+            requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -58,6 +78,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/system/Authorize.vue'),
           meta: {
             title: 'Authorize',
+            requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
 
@@ -67,14 +88,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Discount.vue'),
           meta: {
             title: 'Discount',
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'vps',
-          name: 'vps',
-          component: () => import('@/views/dashboard/examples/service/Vps.vue'),
-          meta: {
-            title: 'VPS',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -83,22 +97,8 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/service/DomainProduct.vue'),
           meta: {
             title: 'Domain',
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'hosting',
-          name: 'hosting',
-          component: () => import('@/views/dashboard/examples/service/Hosting.vue'),
-          meta: {
-            title: 'Hosting',
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'account-vps',
-          name: 'accountVps',
-          component: () => import('@/views/dashboard/examples/account/VpsAccount.vue'),
-          meta: {
-            title: 'AccountVps',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
           } as RouteMeta & IRouteMeta
         },
         {
@@ -107,14 +107,8 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/account/DomainAccount.vue'),
           meta: {
             title: 'Tài khoản miền',
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'account-hosting',
-          name: 'accountHosting',
-          component: () => import('@/views/dashboard/examples/account/HostingAccount.vue'),
-          meta: {
-            title: 'AccountHosting',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
           } as RouteMeta & IRouteMeta
         },
         {
@@ -123,6 +117,8 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Customer.vue'),
           meta: {
             title: 'Customer',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
           } as RouteMeta & IRouteMeta
         },
         {
@@ -131,14 +127,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/category/CustomerType.vue'),
           meta: {
             title: 'Customer Type',
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'invoice',
-          name: 'invoice',
-          component: () => import('@/views/dashboard/examples/management/Invoice.vue'),
-          meta: {
-            title: 'Invoice',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -147,14 +136,18 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Order.vue'),
           meta: {
             title: 'Order',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
           } as RouteMeta & IRouteMeta
         },
         {
-          path: 'contract',
-          name: 'contract',
-          component: () => import('@/views/dashboard/examples/management/Contract.vue'),
+          path: 'payment-method',
+          name: 'Payment Method',
+          component: () => import('@/views/dashboard/examples/management/PaymentMethod.vue'),
           meta: {
-            title: 'Contract',
+            title: 'Payment Method',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
           } as RouteMeta & IRouteMeta
         },
         {
@@ -178,8 +171,39 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach((to,from) => {
-  document.title = to.meta.title as string;
+router.beforeEach((to,from,next) => {
+  
+
+  const userJson = localStorage.getItem("currentEmployeeContent");
+  const user = userJson ? (JSON.parse(userJson) as Employee) : null;
+
+  if (to.meta.requiresAuth) {
+    if (!user) {
+      return next({ name: "login" });
+    }
+
+    const allowedRoles = to.meta.roles as string[] || [];
+
+    console.log(to.meta);
+
+    if (to.meta.roles) {
+      const hasPermission = user.hasRoles?.some(role => allowedRoles.includes(role));
+      if (hasPermission) {
+        console.log("Có quyền");
+        return next();
+      } else {
+        console.log("Không có quyền");
+        return next(from);
+      }
+    }
+
+    // Nếu không có yêu cầu vai trò cụ thể
+    return next();
+  }
+  else if(!to.meta.requiresAuth && user) return next(from);
+  document.title = to.meta.title as string || "Default Title";
+  // Nếu không yêu cầu auth, tiếp tục bình thường
+  next();
 })
 
 export default router

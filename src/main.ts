@@ -1,5 +1,6 @@
 import './assets/css/main.css';
-
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createNotivue } from 'notivue'
@@ -15,7 +16,7 @@ const notivue = createNotivue({
     position: "bottom-right"
 })
 const app = createApp(App)
-
+app.component('VueDatePicker', VueDatePicker);
 app.component(VueFeather.name, VueFeather);
 app.component('PageHeader', PageHeaderVue);
 app.component('Icon', Icon);

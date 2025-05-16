@@ -1,14 +1,18 @@
-import type { APIResponse, ChangeMessage, Employee } from "@/interfaces";
+import type { APIResponse, Employee } from "@/interfaces";
 import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
-
+import { useRouter } from "vue-router";
 export const useEmployeeStore = defineStore('employeeStore',() => {
-    
-  const employee = ref<Employee|null>(null);
+  
+  const userJson = localStorage.getItem("currentEmployeeContent");
+
+  const employee = ref<Employee|null>(userJson ? (JSON.parse(userJson) as Employee) : null);
 
   const employees = ref<Employee[]>([]);
+
+  const router = useRouter();
 
   const loginEmployee = async (form: Record<string, string>) => {
       
@@ -18,11 +22,18 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
       employee.value = response.data;
         
       localStorage.setItem("currentEmployeeContent", JSON.stringify(response.data));
+
+      router.replace({name : "home"});
         
       return response.data;
 
     } catch (error) {
+
       console.log(error);
+
+      router.replace({name : "login"});
+      
+      handleError(error);
     }
     
   };
@@ -33,8 +44,10 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       localStorage.removeItem("currentEmployeeContent");
 
+      router.replace({name : "login"});
+
     } catch (error) {
-      console.log(error);
+      handleError(error);
     }
   }
 

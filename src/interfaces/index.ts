@@ -63,3 +63,28 @@ export interface DomainAccount{
     registerPanel: string,
     username: string
 }
+
+export interface Discount{
+    id: string,
+    percentage: number,
+    customerType: CustomerType,
+    discountCode: string,
+    description: string,
+    expiredAt: Date,
+}
+
+export interface PaymentMethod{
+    id: string,
+    paymentMethodName: string,
+}
+
+export interface Order{
+    id: string,
+    domainProduct : DomainProduct,
+    customer: Customer,
+    paymentMethod: PaymentMethod,
+    durationByMonth: number,
+    domainFirstPart: string,
+    totalPrice: number,
+    status: string,
+}

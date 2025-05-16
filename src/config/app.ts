@@ -81,9 +81,9 @@ export const APP_MENU: Record<string, Menu> = {
         path: 'order',
       },
       {
-        title: 'Hợp đồng',
+        title: 'Phương thức thanh toán',
         icon: 'ReceiptText',
-        path: 'contract',
+        path: 'payment-method',
       },
       {
         title: 'Mã giảm giá',

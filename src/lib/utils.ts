@@ -15,9 +15,20 @@ export const handleSucess = (title: string, message : string) => {
   })
 }
 export const handleError = (err : any) => {
-  const error = err.response.data as Error;
+
+  if(typeof(err.response.data) == 'string' ){
+    push.error({
+    title: err.response.status,
+    message : err.response.data
+    })
+  }
+  else{
+    const error = err.response.data as Error;
   push.error({
     title: err.response.status,
     message : error.message
   })
+  }
+  
+  
 }
