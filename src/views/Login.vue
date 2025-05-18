@@ -13,10 +13,10 @@ const router = useRouter();
 const formSchema = toTypedSchema(z.object({
   password: z.string().min(3,{
     message : "Mật khẩu phải có ít nhất 3 ký tự"
-  }).default("123"),
+  }).default("Pa$$w0rd"),
   email: z.string().email({
     message : "Email phải có đuôi @gmail.com"
-  }).default("lehoangtuan783@gmail.com"),
+  }).default("tuan92381@st.vimaru.edu.vn"),
 }));
 
 const store = useEmployeeStore();

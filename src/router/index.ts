@@ -55,6 +55,24 @@ const router = createRouter({
           } as RouteMeta & IRouteMeta
         },
         {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('@/views/dashboard/examples/Profile.vue'),
+          meta: {
+            title: 'Profile',
+            requiresAuth: true
+          } as RouteMeta & IRouteMeta
+        },
+        {
+          path: 'change-password',
+          name: 'Change Password',
+          component: () => import('@/views/dashboard/examples/ChangePassword.vue'),
+          meta: {
+            title: 'Change Password',
+            requiresAuth: true
+          } as RouteMeta & IRouteMeta
+        },
+        {
           path: 'employee',
           name: 'employee',
           component: () => import('@/views/dashboard/examples/system/Employee.vue'),
@@ -146,6 +164,26 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/PaymentMethod.vue'),
           meta: {
             title: 'Payment Method',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
+          } as RouteMeta & IRouteMeta
+        },
+        {
+          path: 'category',
+          name: 'Category',
+          component: () => import('@/views/dashboard/examples/category/Category.vue'),
+          meta: {
+            title: 'Category',
+            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+
+          } as RouteMeta & IRouteMeta
+        },
+        {
+          path: 'New',
+          name: 'New',
+          component: () => import('@/views/dashboard/examples/management/New.vue'),
+          meta: {
+            title: 'New',
             requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
 
           } as RouteMeta & IRouteMeta

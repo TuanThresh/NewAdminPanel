@@ -62,6 +62,16 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
       handleError(error);
     }
   }
+
+  const getEmployeeByName = async (name: string) => {
+    try {
+      const response = await axios.get<Employee>(`/employee/${name}`) as APIResponse<Employee>;
+
+      return response.data;
+    } catch (error) {
+      console.log(error)
+    }
+  }
   
   const addEmployee = async (form : Record<string,string>) => {
     try {
@@ -99,7 +109,7 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       await getEmployees();
 
-      handleSucess(response.status.toString(),response.data)
+      handleSucess(response.status.toString(),response.data);
 
       return response.data;
     } catch (error) {
@@ -107,5 +117,16 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
     }
   }
 
-  return {loginEmployee,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,employee,employees};
+  const changePassword = async (form : Record<string,string>) => {
+    try {
+      const response = await axios.put("/employee/change_password",form);
+
+      handleSucess(response.status.toString(),response.data);
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+  return {loginEmployee,changePassword,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,getEmployeeByName,employee,employees};
 })

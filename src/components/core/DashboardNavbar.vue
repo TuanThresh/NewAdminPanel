@@ -66,9 +66,14 @@ const employeeStore = useEmployeeStore();
         </DropdownMenuTrigger>
         <DropdownMenuContent class="w-56 relative mr-4">
           <DropdownMenuSeparator />
-          <DropdownMenuItem class="cursor-pointer">
+          <DropdownMenuItem class="cursor-pointer" @click="router.push(`/dashboard/profile`)">
             <User class="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem class="cursor-pointer" @click="router.push(`/dashboard/change-password`)">
+            <User class="mr-2 h-4 w-4" />
+            <span>Change Password</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="employeeStore.logoutEmployee()" class="cursor-pointer">

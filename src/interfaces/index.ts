@@ -5,6 +5,8 @@ export interface Employee{
     email : string,
     status : string,
     name : string,
+    phoneNumber: string,
+    address: string,
     hasRoles : string[]
 }
 export interface APIResponse<T>{
@@ -87,4 +89,16 @@ export interface Order{
     domainFirstPart: string,
     totalPrice: number,
     status: string,
+}
+export interface Category{
+    id: string,
+    name: string,
+    description: string,
+}
+export interface New{
+    id: string,
+    category: string,
+    title: string,
+    content: string,
+    imageUrl: string,
 }

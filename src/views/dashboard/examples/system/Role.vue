@@ -75,6 +75,7 @@ const columns: ColumnDef<Role>[] = [
               </FormItem>
           </FormField>
       </div>
+      <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm quyền" }}</Button>
       </form>
 

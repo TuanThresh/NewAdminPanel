@@ -79,7 +79,7 @@ const toggleSidebar = () => {
         </div>
         <ScrollArea style="height: calc(100vh - 64px)">
           <div v-for="menu in menus" :key="menu.key" class="border-b-[1px] transition-all" :class="store.sidebarExpanded ? 'p-4' : 'p-2'">
-            <Collapsible>
+            <Collapsible :open="store.sidebarExpanded">
               <CollapsibleTrigger class="w-full">
                 <Toggle
                   class="w-full overflow-x-hidden justify-start duration-150"
@@ -98,7 +98,7 @@ const toggleSidebar = () => {
                 
                 </Toggle>
               </CollapsibleTrigger>
-            <CollapsibleContent class="mt-2">
+            <CollapsibleContent class="mt-2" >
               <ul>
                 <li v-for="child in menu.routes" :key="`${menu.key}-${child.path}`" class="flex items-center mb-1 rounded-md">
                 <TooltipProvider :disable-hoverable-content="true">

@@ -39,13 +39,18 @@ const columns: ColumnDef<Order>[] = [
       h('div', { class: 'flex items-center' }, [
         h(
           Button,
-          { variant: 'default', class: 'mr-2', onClick: async() => await store.editOrder({status: "Paid"}) },
+          { variant: 'default', class: 'mr-2', onClick: async() => await store.editOrder({id: row.original.id,status: "Paid"}) ,disabled : row.original.status != "Pending"},
           () => 'Chấp nhận'
         ),
         h(
           Button,
-          { variant: 'destructive', onClick: async () => await store.editOrder({status: "Cancelled"}) },
+          { variant: 'destructive',class: 'mr-2', onClick: async () => await store.editOrder({id: row.original.id,status: "Cancelled"}),disabled : row.original.status != "Pending" },
           () => 'Hủy bỏ'
+        ),
+        h(
+          Button,
+          { variant: 'secondary', onClick: async () => await store.deleteOrder(row.original.id.toString()) },
+          () => 'Xóa'
         ),
       ]),
   },

@@ -30,6 +30,8 @@ const formSchema = toTypedSchema(z.object({
   name: z.string().min(1,{
     message : "Tên nhân viên không được để trống"
   }).default(""),
+  phoneNumber: z.string().min(1,"Số điện thoại không được để trống").default(""),
+  address: z.string().min(1,"Địa chỉ không được để trống").default("")
 }));
 
 const {handleSubmit, values, setValues } = useForm(
@@ -58,6 +60,9 @@ const editMode = ref(false);
 const columns: ColumnDef<Employee>[] = [
   { accessorKey: 'id', header: 'Mã nhân viên' },  // Hiển thị mã nhân viên
   { accessorKey: 'name', header: 'Họ tên' },
+  { accessorKey: 'address', header: 'Địa chỉ' },
+  { accessorKey: 'phoneNumber', header: 'Số điện thoại' },
+
   { accessorKey: 'hasRoles', header: 'Chức vụ' },
   { accessorKey: 'email', header: 'Email' },
   {
@@ -141,6 +146,24 @@ onMounted(async () => {
               </FormItem>
           </FormField>
       </div>
+      <FormField v-slot="{ componentField }" name="address">
+            <FormItem class="mb-4">
+              <FormLabel>Địa chỉ</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" placeholder="Địa chỉ"/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+          <FormField v-slot="{ componentField }" name="phoneNumber">
+            <FormItem class="mb-4">
+              <FormLabel>Số điện thoại</FormLabel>
+              <FormControl>
+                <Input type="text" v-bind="componentField" placeholder="Số điện thoại"/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>  
       <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
       <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->

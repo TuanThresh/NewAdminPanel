@@ -57,10 +57,15 @@ export const APP_MENU: Record<string, Menu> = {
     name: 'Danh mục',
     icon: 'UserCog',
     children: [
-            {
+      {
         title: 'Loại khách hàng',
         icon: 'ReceiptText',
         path: 'customer-type',
+      },
+      {
+        title: 'Loại tin tức',
+        icon: 'ReceiptText',
+        path: 'category',
       },
 
     ]
@@ -89,6 +94,11 @@ export const APP_MENU: Record<string, Menu> = {
         title: 'Mã giảm giá',
         icon: 'ReceiptText',
         path: 'discount',
+      },
+      {
+        title: 'Tin tức',
+        icon: 'ReceiptText',
+        path: 'new',
       },
     ],
   },
