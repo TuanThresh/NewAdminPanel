@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import router from '@/router';
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { APP_MENU } from '@/config/app';
 import { ArrowLeftToLine } from 'lucide-vue-next';
 import { useAppStore } from '@/stores/app';
@@ -20,26 +20,28 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import Icon from '@/components/ui/Icon.vue';
-import { useEmployeeStore } from '@/stores/employeeStore';
+import type { Employee } from '@/interfaces';
 const route = useRoute()
+const userJson = localStorage.getItem("currentEmployeeContent");
+const user = userJson ? (JSON.parse(userJson) as Employee) : null;
 
-const employeeStore = useEmployeeStore();
 
-const menus = ref(Object.entries(APP_MENU).map(([key, value]) => ({
+const menus = computed(() => Object.entries(APP_MENU).map(([key, value]) => ({
 
     key,
     name: value.name,
     icon : value.icon,
     routes: value.children.map((r) => ({
       ...r,
+      accessible: user?.hasRoles.some(role => (router.resolve(r.path).meta?.roles as string[]).includes(role)),
       active: `/dashboard/${r.path}` === route.path,
     })),
   })
 ));
 
-if(!employeeStore.employee?.hasRoles.includes("Quản trị viên")){
-  menus.value = menus.value.filter(x => x.key !== "system");
-}
+// if(!employeeStore.employee?.hasRoles.includes("Quản trị viên")){
+//   menus.value = menus.value.filter(x => x.key !== "system");
+// }
 
 const handleNavigate = (path: string) => {
   router.push(path);
@@ -78,7 +80,7 @@ const toggleSidebar = () => {
           </div>
         </div>
         <ScrollArea style="height: calc(100vh - 64px)">
-          <div v-for="menu in menus" :key="menu.key" class="border-b-[1px] transition-all" :class="store.sidebarExpanded ? 'p-4' : 'p-2'">
+          <div v-for="menu in menus" :key="menu.key" class="border-b-[1px] transition-all" :class="store.sidebarExpanded ? 'p-4' : 'p-2'" v-show="menu.routes.filter(x => x.accessible).length > 0">
             <Collapsible :open="store.sidebarExpanded">
               <CollapsibleTrigger class="w-full">
                 <Toggle
@@ -100,7 +102,7 @@ const toggleSidebar = () => {
               </CollapsibleTrigger>
             <CollapsibleContent class="mt-2" >
               <ul>
-                <li v-for="child in menu.routes" :key="`${menu.key}-${child.path}`" class="flex items-center mb-1 rounded-md">
+                <li v-for="child in menu.routes" :key="`${menu.key}-${child.path}`" class="flex items-center mb-1 rounded-md" v-show="child.accessible">
                 <TooltipProvider :disable-hoverable-content="true">
                   <Tooltip :delay-duration="0">
                     <TooltipTrigger class="w-full">

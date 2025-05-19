@@ -50,5 +50,15 @@ export const useOrderStore = defineStore('orderStore',() => {
     }
   }
 
-  return {getOrders,editOrder,deleteOrder,orders};
+  const getStatistic = async(form: Record<string,string>) => {
+    try {
+      const response = await axios.post("/order/statistic",form);
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return {getOrders,editOrder,deleteOrder,getStatistic,orders};
 })

@@ -45,7 +45,12 @@ const appStore = useAppStore();
 
 const store = useDiscountStore();
 
+const defaultValues = {...values};
 
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
 
 const onSubmit = handleSubmit(async () =>{
   if(editMode.value){
@@ -152,7 +157,7 @@ const columns: ColumnDef<Discount>[] = [
           </FormField>
       </div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
-      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.discounts"></DataTable>
   </div>

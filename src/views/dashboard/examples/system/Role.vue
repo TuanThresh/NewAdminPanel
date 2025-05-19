@@ -25,6 +25,8 @@ const {handleSubmit, values, setValues } = useForm(
 );
 const editMode = ref(false);
 
+
+
 onMounted(async() => {
   await store.getRoles();
 })
@@ -35,7 +37,12 @@ const onSubmit = handleSubmit(async () =>{
   }
   else await store.addRole(values);
 })
+const defaultValues = {...values};
 
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
 
 // 🔹 Cấu hình cột cho DataTable
 const columns: ColumnDef<Role>[] = [
@@ -77,6 +84,8 @@ const columns: ColumnDef<Role>[] = [
       </div>
       <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm quyền" }}</Button>
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
+
       </form>
 
     <DataTable :columns="columns" :data="store.roles"></DataTable>

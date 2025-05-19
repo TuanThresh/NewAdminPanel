@@ -64,6 +64,15 @@ export const useCustomerStore = defineStore('customerStore',() => {
       handleError(error);
     }
   }
+  const getStatistic = async(form: Record<string,string>) => {
+      try {
+        const response = await axios.post("/customer/statistic",form);
+  
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+  }
 
-  return {getCustomers,addCustomer,editCustomer,deleteCustomer,customers};
+  return {getCustomers,addCustomer,editCustomer,deleteCustomer,getStatistic,customers};
 })

@@ -51,7 +51,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/Home.vue'),
           meta: {
             title: 'Home',
-            requiresAuth: true
+            requiresAuth: true,
           } as RouteMeta & IRouteMeta
         },
         {
@@ -106,7 +106,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Discount.vue'),
           meta: {
             title: 'Discount',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -115,7 +115,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/service/DomainProduct.vue'),
           meta: {
             title: 'Domain',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
@@ -125,7 +125,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/account/DomainAccount.vue'),
           meta: {
             title: 'Tài khoản miền',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
@@ -135,7 +135,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Customer.vue'),
           meta: {
             title: 'Customer',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng','Nhân viên phòng kinh doanh và tiếp thị']
 
           } as RouteMeta & IRouteMeta
         },
@@ -145,7 +145,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/category/CustomerType.vue'),
           meta: {
             title: 'Customer Type',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
           } as RouteMeta & IRouteMeta
         },
         {
@@ -154,7 +154,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/Order.vue'),
           meta: {
             title: 'Order',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
@@ -164,7 +164,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/PaymentMethod.vue'),
           meta: {
             title: 'Payment Method',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kĩ thuật và hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
@@ -174,7 +174,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/category/Category.vue'),
           meta: {
             title: 'Category',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
 
           } as RouteMeta & IRouteMeta
         },
@@ -184,7 +184,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/management/New.vue'),
           meta: {
             title: 'New',
-            requiresAuth: true,roles: ['Quản trị viên','Nhân viên']
+            requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
 
           } as RouteMeta & IRouteMeta
         },
@@ -227,7 +227,6 @@ router.beforeEach((to,from,next) => {
     if (to.meta.roles) {
       const hasPermission = user.hasRoles?.some(role => allowedRoles.includes(role));
       if (hasPermission) {
-        console.log("Có quyền");
         return next();
       } else {
         console.log("Không có quyền");
@@ -235,12 +234,11 @@ router.beforeEach((to,from,next) => {
       }
     }
 
-    // Nếu không có yêu cầu vai trò cụ thể
     return next();
   }
   else if(!to.meta.requiresAuth && user) return next(from);
   document.title = to.meta.title as string || "Default Title";
-  // Nếu không yêu cầu auth, tiếp tục bình thường
+
   next();
 })
 

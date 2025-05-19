@@ -1,18 +1,62 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DateRangePicker } from '@/components/ui/daterange-picker';
 import RecentSales from '@/components/examples/RecentSales.vue';
 import Overview from '@/components/examples/Overview.vue';
+import { useEmployeeStore } from '@/stores/employeeStore';
+import { onMounted,ref } from 'vue';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import { useCustomerStore } from '@/stores/customerStore';
+import { useOrderStore } from '@/stores/orderStore';
+import { useDomainProductStore } from '@/stores/domainProductStore';
+
+const employeeStore = useEmployeeStore();
+const customerStore = useCustomerStore();
+const orderStore = useOrderStore();
+const domainProductStore = useDomainProductStore();
+
+
+const date = ref<[Date,Date]>([new Date(),new Date()]);
+const totalCustomer = ref(0);
+const totalEmployee = ref(0);
+const totalRevenueOrder = ref(0);
+const totalDomainProduct = ref(0);
+
+const onDateChange = async () => {
+  const dateOnly = {
+    from : date.value[0].toISOString().split('T')[0],
+    to: date.value[1].toISOString().split('T')[0]
+  }
+  totalEmployee.value = await employeeStore.getStatistic(dateOnly);
+  totalCustomer.value = await customerStore.getStatistic(dateOnly);
+  totalRevenueOrder.value = await orderStore.getStatistic(dateOnly);
+  totalDomainProduct.value = await domainProductStore.getStatistic(dateOnly);
+
+
+
+
+}
+
+onMounted(async() => {
+  date.value[0] = new Date();
+  date.value[1] = new Date(new Date().setDate(new Date().getDate() + 7));
+
+  await onDateChange()
+
+})
 </script>
 
 <template>
   <div>
-    <page-header title="Dashboard">
+    <page-header title="Thống kê">
       <div class="flex items-center space-x-2">
-        <DateRangePicker />
-        <Button>Download</Button>
+        <VueDatePicker :enable-time-picker="false" 
+          :format="'yyyy-MM-dd'"
+          placeholder="Chọn khoảng ngày"
+          range
+          v-model="date"
+          @update:model-value="onDateChange()"
+        ></VueDatePicker>
       </div>
     </page-header>
 
@@ -36,7 +80,7 @@ import Overview from '@/components/examples/Overview.vue';
           <Card>
             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle class="text-sm font-medium">
-                Total Revenue
+                Tổng doanh thu
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -53,17 +97,14 @@ import Overview from '@/components/examples/Overview.vue';
             </CardHeader>
             <CardContent>
               <div class="text-2xl font-bold">
-                $45,231.89
+                {{ totalRevenueOrder }} đ
               </div>
-              <p class="text-xs text-muted-foreground">
-                +20.1% from last month
-              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle class="text-sm font-medium">
-                Subscriptions
+                Số lượng khách hàng
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -82,17 +123,14 @@ import Overview from '@/components/examples/Overview.vue';
             </CardHeader>
             <CardContent>
               <div class="text-2xl font-bold">
-                +2350
+                {{ totalCustomer }}
               </div>
-              <p class="text-xs text-muted-foreground">
-                +180.1% from last month
-              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle class="text-sm font-medium">
-                Sales
+                Số lượng nhân viên
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,17 +148,14 @@ import Overview from '@/components/examples/Overview.vue';
             </CardHeader>
             <CardContent>
               <div class="text-2xl font-bold">
-                +12,234
+                {{ totalEmployee }}
               </div>
-              <p class="text-xs text-muted-foreground">
-                +19% from last month
-              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle class="text-sm font-medium">
-                Active Now
+                Số lượng miền hoạt động
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,16 +172,12 @@ import Overview from '@/components/examples/Overview.vue';
             </CardHeader>
             <CardContent>
               <div class="text-2xl font-bold">
-                +573
+                {{ totalDomainProduct }}
               </div>
-              <p class="text-xs text-muted-foreground">
-                +201 since last hour
-              </p>
             </CardContent>
           </Card>
         </div>
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-          <Card class="col-span-4">
+        <Card >
             <CardHeader>
               <CardTitle>Overview</CardTitle>
             </CardHeader>
@@ -154,18 +185,6 @@ import Overview from '@/components/examples/Overview.vue';
               <Overview />
             </CardContent>
           </Card>
-          <Card class="col-span-3">
-            <CardHeader>
-              <CardTitle>Recent Sales</CardTitle>
-              <CardDescription>
-                You made 265 sales this month.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RecentSales />
-            </CardContent>
-          </Card>
-        </div>
       </TabsContent>
     </Tabs>
   </div>

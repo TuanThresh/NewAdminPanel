@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/stores/app';
 import { useRouter } from 'vue-router';
 import { useEmployeeStore } from '@/stores/employeeStore';
+import { computed, onMounted } from 'vue';
 
 const store = useAppStore();
 const router = useRouter();
@@ -59,7 +60,7 @@ const employeeStore = useEmployeeStore();
             <Avatar class="h-8 w-8">
               <AvatarImage src="https://github.com/radix-vue.png"></AvatarImage>
             </Avatar>
-            <span class="ml-2 hidden md:flex justify-start flex-col items-start">
+            <span class="ml-2  md:flex justify-start flex-col items-start">
               <p class="mb-0">{{employeeStore.employee?.name}}</p>
             </span>
           </Button>

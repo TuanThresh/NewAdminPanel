@@ -128,5 +128,16 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
       handleError(error);
     }
   }
-  return {loginEmployee,changePassword,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,getEmployeeByName,employee,employees};
+
+  const getStatistic = async(form: Record<string,string>) => {
+    try {
+      const response = await axios.post("/employee/statistic",form);
+
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return {loginEmployee,changePassword,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,getEmployeeByName,getStatistic,employee,employees};
 })

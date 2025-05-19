@@ -35,6 +35,13 @@ const {handleSubmit, values, setValues } = useForm(
 const store = usePaymentMethodStore();
 const editMode = ref(false);
 
+const defaultValues = {...values};
+
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
+
 const onSubmit = handleSubmit(async () =>{
   if(editMode.value){
     await store.editPaymentMethod(values)
@@ -92,7 +99,7 @@ const columns: ColumnDef<PaymentMethod>[] = [
       </div>
       <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
-      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.paymentMethods"></DataTable>
   </div>

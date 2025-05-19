@@ -51,7 +51,12 @@ const editMode = ref(false);
 
 const store = useCustomerStore();
 
+const defaultValues = {...values};
 
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
 
 const onSubmit = handleSubmit(async () =>{
   if(editMode.value){
@@ -166,7 +171,8 @@ const columns: ColumnDef<Customer>[] = [
       </div>
       <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
-      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
+
     </form>
     <DataTable :columns="columns" :data="store.customers" search="name"></DataTable>
   </div>

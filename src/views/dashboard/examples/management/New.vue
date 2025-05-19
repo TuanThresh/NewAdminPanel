@@ -49,6 +49,13 @@ const store = useNewStore();
 
 const categoryStore = useCategoryStore();
 
+const defaultValues = {...values};
+
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
+
 const onSubmit = handleSubmit(async () =>{
   
 
@@ -166,6 +173,8 @@ const columns: ColumnDef<New>[] = [
           </FormField>
       </div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm tin tức" }}</Button>
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
+
     </form>
     <DataTable :columns="columns" :data="store.news"></DataTable>
   </div>

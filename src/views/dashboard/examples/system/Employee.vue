@@ -56,6 +56,19 @@ const editMode = ref(false);
 
 
 
+const defaultValues = {
+  status: 'ChoXacThuc',
+  email: '',
+  name: '',
+  phoneNumber: '',
+  address: '',
+};
+
+const clearForm = () => {
+  editMode.value = false;
+  setValues({ ...defaultValues });
+};
+
 // Cấu hình cột cho DataTable
 const columns: ColumnDef<Employee>[] = [
   { accessorKey: 'id', header: 'Mã nhân viên' },  // Hiển thị mã nhân viên
@@ -166,7 +179,7 @@ onMounted(async () => {
           </FormField>  
       <div></div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
-      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.employees"></DataTable>
   </div>

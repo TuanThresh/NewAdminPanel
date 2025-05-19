@@ -64,6 +64,15 @@ export const useDomainProductStore = defineStore('domainProductStore',() => {
       handleError(error);
     }
   }
+  const getStatistic = async(form: Record<string,string>) => {
+    try {
+      const response = await axios.post("/domain_product/statistic",form);
 
-  return {getDomainProducts,addDomainProduct,editDomainProduct,deleteDomainProduct,domainProducts};
+      return response.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return {getDomainProducts,addDomainProduct,editDomainProduct,deleteDomainProduct,getStatistic,domainProducts};
 })

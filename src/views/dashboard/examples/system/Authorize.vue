@@ -51,6 +51,8 @@ const onSubmit = handleSubmit(async () =>{
   await store.authorize(values);
 })
 
+
+
 const columns: ColumnDef<Authorize>[] = [
   { accessorKey: 'id', header: 'Mã phân quyền' }, 
   { accessorKey: 'employeeName', header: 'Tên nhân viên',cell : ({row}) => row.original.employee.name }, 

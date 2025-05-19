@@ -40,7 +40,12 @@ const {handleSubmit, values, setValues } = useForm(
 const store = useDomainProductStore();
 const editMode = ref(false);
 
+const defaultValues = {...values};
 
+const clearForm = () => {
+  editMode.value = false;
+  setValues({...defaultValues})
+}
 
 const onSubmit = handleSubmit(async () =>{
   if(editMode.value){
@@ -68,7 +73,6 @@ const columns: ColumnDef<DomainProduct>[] = [
           Button,
           { variant: 'outline', class: 'mr-2', onClick: () => {
             editMode.value = true;
-            console.log(row.original)
             setValues({...row.original})
           } },
           () => 'Sửa'
@@ -144,7 +148,7 @@ const columns: ColumnDef<DomainProduct>[] = [
           </FormField>
       </div>
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
-      <!-- <Button v-if="editMode" @click="clearData">Hủy</Button> -->
+      <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.domainProducts"></DataTable>
   </div>
