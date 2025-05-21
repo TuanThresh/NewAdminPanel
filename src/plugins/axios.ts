@@ -7,7 +7,6 @@ const axiosInstance = axios.create({
 })
 axiosInstance.interceptors.request.use((config) => {
 
-    
 
     const {token} = JSON.parse(localStorage.getItem("currentEmployeeContent") || "{}");
 

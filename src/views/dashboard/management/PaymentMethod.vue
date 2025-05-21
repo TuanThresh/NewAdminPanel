@@ -98,7 +98,7 @@ const columns: ColumnDef<PaymentMethod>[] = [
           </FormField>
       </div>
       <div></div>
-      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm phương thức thanh toán" }}</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.paymentMethods"></DataTable>

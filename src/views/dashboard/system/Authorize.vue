@@ -112,7 +112,7 @@ const columns: ColumnDef<Authorize>[] = [
               </FormItem>
           </FormField>
       </div>
-      <Button type="submit">Thêm quyền</Button>
+      <Button type="submit">Phân quyền</Button>
       </form>
 
     <DataTable :columns="columns" :data="store.authorizes"></DataTable>

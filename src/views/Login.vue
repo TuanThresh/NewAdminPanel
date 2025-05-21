@@ -35,7 +35,7 @@ const onSubmit = form.handleSubmit(async () => {
   <main class="h-screen w-screen flex items-center justify-center">
     <Card class="max-w-[320px] md:max-w-[400px] w-full">
       <CardHeader>
-        <CardTitle class="text-center">Login</CardTitle>
+        <CardTitle class="text-center">Đăng nhập</CardTitle>
       </CardHeader>
       <CardContent>
         <form @submit="onSubmit">

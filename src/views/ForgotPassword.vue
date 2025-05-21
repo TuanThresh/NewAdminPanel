@@ -11,6 +11,7 @@ import { useEmployeeStore } from '@/stores/employeeStore';
 import { RouterLink } from 'vue-router';
 import axios from '@/plugins/axios';
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from '@/stores/app';
 const router = useRouter();
 const formSchema = toTypedSchema(z.object({
   email: z.string().email({
@@ -19,6 +20,8 @@ const formSchema = toTypedSchema(z.object({
 }));
 
 const store = useEmployeeStore();
+
+const appStore = useAppStore();
 
 const form = useForm({
       validationSchema: formSchema,
@@ -30,9 +33,11 @@ const onSubmit = form.handleSubmit(async () => {
     const response = await axios.post("employee/forgot_password",{
     email: form.values.email
   })
-  handleSucess(response.status.toString(),response.data)
+  handleSucess(response.status.toString(),response.data);
+  appStore.setLoading(false);
   
   } catch (error) {
+  appStore.setLoading(false);
     handleError(error);
   }
 });

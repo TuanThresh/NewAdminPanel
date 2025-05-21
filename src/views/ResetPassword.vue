@@ -11,6 +11,7 @@ import { useEmployeeStore } from '@/stores/employeeStore';
 import { RouterLink } from 'vue-router';
 import axios from '@/plugins/axios';
 import { handleSucess,handleError } from '@/lib/utils';
+import { useAppStore } from '@/stores/app';
 const router = useRouter();
 const route = useRoute();
 const formSchema = toTypedSchema(z.object({
@@ -23,6 +24,8 @@ const formSchema = toTypedSchema(z.object({
 }));
 
 const store = useEmployeeStore();
+const appStore = useAppStore();
+
 
 const form = useForm({
       validationSchema: formSchema,
@@ -38,9 +41,14 @@ const onSubmit = form.handleSubmit(async () => {
     confirmPassword: form.values.confirmPassword
   })
   handleSucess(response.status.toString(),response.data)
+  appStore.setLoading(false);
+
   router.replace("login");
   
+  
   } catch (error) {
+  appStore.setLoading(false);
+
         handleError(error);
 
   }
@@ -55,7 +63,7 @@ const onSubmit = form.handleSubmit(async () => {
         <CardTitle class="text-center">Đổi mật khẩu</CardTitle>
       </CardHeader>
       <CardContent>
-        <form @submit="onSubmit">
+        <form @submit="onSubmit" class="space-y-2">
           <FormField v-slot="{ componentField }" name="newPassword">
             <FormItem>
               <FormLabel>Mật khẩu mới</FormLabel>

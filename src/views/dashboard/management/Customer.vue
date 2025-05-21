@@ -172,7 +172,7 @@ const columns: ColumnDef<Customer>[] = [
           </FormField>
       </div>
       <div></div>
-      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm khách hàng" }}</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
 
     </form>

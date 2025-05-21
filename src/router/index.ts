@@ -51,7 +51,7 @@ const router = createRouter({
           component: () => import('@/views/dashboard/examples/Home.vue'),
           meta: {
             title: 'Thống kê',
-            roles:['Nhân viên phòng tài chính kế toán'],
+            roles:['Nhân viên phòng tài chính và kế toán'],
             requiresAuth: true,
           } as RouteMeta & IRouteMeta
         },
