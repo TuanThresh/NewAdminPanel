@@ -11,7 +11,6 @@ interface SubMenu {
   icon: string,
   path: string
   description?: string,
-  roles: string[]
 }
 export const SIDEBAR_EXPAND_WIDTH = 280;
 export const SIDEBAR_COLLAPSED_WIDTH = 72;
@@ -24,19 +23,19 @@ export const APP_MENU: Record<string, Menu> = {
         title: 'Nhân viên',
         icon: 'User',
         path: 'employee',
-        roles: ["Quản trị viên"]
+      
       },
       {
         title: 'Quyền',
         icon: 'UserPlus',
         path: 'role',
-        roles: ["Quản trị viên"]
+      
       },
       {
         title: 'Phân Quyền',
         icon: 'UserCog',
         path: 'authorize',
-        roles: ["Quản trị viên"]
+      
       },
 
     ],
@@ -49,13 +48,11 @@ export const APP_MENU: Record<string, Menu> = {
         title: 'Tài khoản miền',
         icon: 'Computer',
         path: 'domain-account',
-        roles: ["Quản trị viên","Nhân viên"]
       },
       {
         title: 'Miền',
         icon: 'MemoryStick',
         path: 'domain',
-        roles: ["Quản trị viên","Nhân viên"]
       },
     ]
   },
@@ -66,15 +63,13 @@ export const APP_MENU: Record<string, Menu> = {
     children: [
       {
         title: 'Loại khách hàng',
-        icon: 'ReceiptText',
+        icon: 'Airplay',
         path: 'customer-type',
-        roles: ["Quản trị viên","Nhân viên"]
       },
       {
         title: 'Loại tin tức',
-        icon: 'ReceiptText',
+        icon: 'BookText',
         path: 'category',
-        roles: ["Quản trị viên","Nhân viên"]
       },
 
     ]
@@ -84,35 +79,35 @@ export const APP_MENU: Record<string, Menu> = {
     icon: 'AppWindow',
     children: [
       {
+        title: 'Thống kê',
+        icon: 'ReceiptText',
+        path: 'home',
+      },
+      {
         title: 'Khách hàng',
         icon: 'BookUser',
         path: 'customer',
-        roles: ["Quản trị viên","Nhân viên"]
       },
 
       {
         title: 'Đơn hàng',
-        icon: 'ReceiptText',
+        icon: 'PackageOpen',
         path: 'order',
-        roles: ["Quản trị viên","Nhân viên"]
       },
       {
         title: 'Phương thức thanh toán',
-        icon: 'ReceiptText',
+        icon: 'WalletCards',
         path: 'payment-method',
-        roles: ["Quản trị viên","Nhân viên"]
       },
       {
         title: 'Mã giảm giá',
-        icon: 'ReceiptText',
+        icon: 'TicketPercent',
         path: 'discount',
-        roles: ["Quản trị viên","Nhân viên"]
       },
       {
         title: 'Tin tức',
-        icon: 'ReceiptText',
+        icon: 'Newspaper',
         path: 'new',
-        roles: ["Quản trị viên","Nhân viên"]
       },
     ],
   },

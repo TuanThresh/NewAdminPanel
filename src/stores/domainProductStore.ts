@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useDomainProductStore = defineStore('domainProductStore',() => {
     
 
   const domainProducts = ref<DomainProduct[]>([]);
+
+    const appStore = useAppStore();
+  
 
   const getDomainProducts = async () => {
     try {
@@ -15,8 +19,13 @@ export const useDomainProductStore = defineStore('domainProductStore',() => {
 
       domainProducts.value = response.data;
 
+        appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+        appStore.setLoading(false);
+      
       handleError(error);
     }
   }
@@ -28,11 +37,18 @@ export const useDomainProductStore = defineStore('domainProductStore',() => {
 
       await getDomainProducts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+
+        appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
@@ -43,11 +59,17 @@ export const useDomainProductStore = defineStore('domainProductStore',() => {
 
       await getDomainProducts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -57,22 +79,52 @@ export const useDomainProductStore = defineStore('domainProductStore',() => {
 
       await getDomainProducts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }
-  const getStatistic = async(form: Record<string,string>) => {
+  const getStatistic = async(form: Record<string,string>,status : string) => {
     try {
-      const response = await axios.post("/domain_product/statistic",form);
+      const response = await axios.post(`/domain_product/statistic?domainTypeEnum=${status}`,form);
+
+        appStore.setLoading(false);
+
 
       return response.data;
     } catch (error) {
-      console.log(error);
+
+        appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
-  return {getDomainProducts,addDomainProduct,editDomainProduct,deleteDomainProduct,getStatistic,domainProducts};
+  const getOverview = async(status : string) => {
+    try {
+      const response = await axios.get(`/domain_product/overview?domainTypeEnum=${status}`);
+
+        appStore.setLoading(false);
+
+
+      return response.data;
+    } catch (error) {
+
+        appStore.setLoading(false);
+
+            handleError(error);
+;
+    }
+  }
+
+  return {getDomainProducts,addDomainProduct,editDomainProduct,deleteDomainProduct,getStatistic,getOverview,domainProducts};
 })

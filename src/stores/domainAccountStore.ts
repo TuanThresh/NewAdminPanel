@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useDomainAccountStore = defineStore('domainAccountStore',() => {
     
 
   const domainAccounts = ref<DomainAccount[]>([]);
+
+      const appStore = useAppStore();
+  
 
   const getDomainAccounts = async () => {
     try {
@@ -15,8 +19,14 @@ export const useDomainAccountStore = defineStore('domainAccountStore',() => {
 
       domainAccounts.value = response.data;
 
+        appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -28,11 +38,17 @@ export const useDomainAccountStore = defineStore('domainAccountStore',() => {
 
       await getDomainAccounts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+        appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
@@ -43,11 +59,17 @@ export const useDomainAccountStore = defineStore('domainAccountStore',() => {
 
       await getDomainAccounts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -57,10 +79,16 @@ export const useDomainAccountStore = defineStore('domainAccountStore',() => {
 
       await getDomainAccounts();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }

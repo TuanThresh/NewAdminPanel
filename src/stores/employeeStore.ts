@@ -4,6 +4,7 @@ import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
 import { useRouter } from "vue-router";
+import { useAppStore } from "./app";
 export const useEmployeeStore = defineStore('employeeStore',() => {
   
   const userJson = localStorage.getItem("currentEmployeeContent");
@@ -14,6 +15,10 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
   const router = useRouter();
 
+  const appStore = useAppStore();
+  
+    
+
   const loginEmployee = async (form: Record<string, string>) => {
       
     try {
@@ -23,15 +28,20 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
         
       localStorage.setItem("currentEmployeeContent", JSON.stringify(response.data));
 
-      router.replace({name : "home"});
+      router.replace({name : "profile"});
+
+      appStore.setLoading(false);
         
       return response.data;
 
     } catch (error) {
 
-      console.log(error);
+            handleError(error);
+;
 
       router.replace({name : "login"});
+
+      appStore.setLoading(false);
       
       handleError(error);
     }
@@ -46,8 +56,12 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       router.replace({name : "login"});
 
+      appStore.setLoading(false);
+
     } catch (error) {
       handleError(error);
+
+      appStore.setLoading(false);
     }
   }
 
@@ -57,8 +71,12 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       employees.value = response.data;
 
+      appStore.setLoading(false);
+
       return response.data;
     } catch (error) {
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -67,9 +85,16 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
     try {
       const response = await axios.get<Employee>(`/employee/${name}`) as APIResponse<Employee>;
 
+      appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
-      console.log(error)
+
+      appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
   
@@ -80,11 +105,18 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       await getEmployees();
 
-      handleSucess(response.status.toString(),response.data)
+      appStore.setLoading(false);
+
+
+      handleSucess(response.status.toString(),response.data)      
 
       return response.data
     } catch (error) {
-      console.log(error);
+
+      appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
@@ -95,11 +127,17 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       await getEmployees();
 
+      appStore.setLoading(false);
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+
+      appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -109,10 +147,14 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
 
       await getEmployees();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data);
 
       return response.data;
     } catch (error) {
+      appStore.setLoading(false);
       handleError(error);
     }
   }
@@ -121,23 +163,52 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
     try {
       const response = await axios.put("/employee/change_password",form);
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data);
 
       return response.data;
     } catch (error) {
+
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
 
-  const getStatistic = async(form: Record<string,string>) => {
+  const getStatistic = async(form: Record<string,string>,status : string) => {
     try {
-      const response = await axios.post("/employee/statistic",form);
+      const response = await axios.post(`/employee/statistic?employeeStatusEnum=${status}`,form);
+
+      appStore.setLoading(false);
+
 
       return response.data;
     } catch (error) {
-      console.log(error);
+
+      appStore.setLoading(false);
+
+      handleError(error);
+
     }
   }
 
-  return {loginEmployee,changePassword,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,getEmployeeByName,getStatistic,employee,employees};
+  const getOverview = async(status : string) => {
+    try {
+      const response = await axios.get(`/employee/overview?employeeStatusEnum=${status}`);
+
+      appStore.setLoading(false);
+
+
+      return response.data;
+    } catch (error) {
+
+      appStore.setLoading(false);
+
+      handleError(error);
+    }
+  }
+
+  return {loginEmployee,changePassword,logoutEmployee,getEmployees,addEmployee,editEmployee,deleteEmployee,getEmployeeByName,getStatistic,getOverview,employee,employees};
 })

@@ -4,7 +4,6 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createNotivue } from 'notivue'
-import VueFeather from 'vue-feather';
 import PageHeaderVue from './components/ui/PageHeader.vue';
 import Icon from '@/components/ui/Icon.vue';
 import 'notivue/notification.css'
@@ -17,7 +16,6 @@ const notivue = createNotivue({
 })
 const app = createApp(App)
 app.component('VueDatePicker', VueDatePicker);
-app.component(VueFeather.name, VueFeather);
 app.component('PageHeader', PageHeaderVue);
 app.component('Icon', Icon);
 app.use(createPinia())

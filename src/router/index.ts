@@ -11,7 +11,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/dashboard/home',
+      redirect: '/dashboard/profile',
     },
     {
       path: '/login',
@@ -40,7 +40,7 @@ const router = createRouter({
     {
       path: '/dashboard',
       component: DashboardLayoutVue,
-      redirect: '/dashboard/home',
+      redirect: '/dashboard/profile',
       meta: {
         title: 'Dashboard',
       },
@@ -50,7 +50,8 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/views/dashboard/examples/Home.vue'),
           meta: {
-            title: 'Home',
+            title: 'Thống kê',
+            roles:['Nhân viên phòng tài chính kế toán'],
             requiresAuth: true,
           } as RouteMeta & IRouteMeta
         },
@@ -59,7 +60,7 @@ const router = createRouter({
           name: 'profile',
           component: () => import('@/views/dashboard/examples/Profile.vue'),
           meta: {
-            title: 'Profile',
+            title: 'Hồ sơ',
             requiresAuth: true
           } as RouteMeta & IRouteMeta
         },
@@ -68,34 +69,34 @@ const router = createRouter({
           name: 'Change Password',
           component: () => import('@/views/dashboard/examples/ChangePassword.vue'),
           meta: {
-            title: 'Change Password',
+            title: 'Đổi mật khẩu',
             requiresAuth: true
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'employee',
           name: 'employee',
-          component: () => import('@/views/dashboard/examples/system/Employee.vue'),
+          component: () => import('@/views/dashboard/system/Employee.vue'),
           meta: {
-            title: 'Employee',
+            title: 'Nhân viên',
             requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'role',
           name: 'role',
-          component: () => import('@/views/dashboard/examples/system/Role.vue'),
+          component: () => import('@/views/dashboard/system/Role.vue'),
           meta: {
-            title: 'Role',
+            title: 'Quyền',
             requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'authorize',
           name: 'authorize',
-          component: () => import('@/views/dashboard/examples/system/Authorize.vue'),
+          component: () => import('@/views/dashboard/system/Authorize.vue'),
           meta: {
-            title: 'Authorize',
+            title: 'Phân quyền',
             requiresAuth: true,roles: ['Quản trị viên']
           } as RouteMeta & IRouteMeta
         },
@@ -103,26 +104,26 @@ const router = createRouter({
         {
           path: 'discount',
           name: 'discount',
-          component: () => import('@/views/dashboard/examples/management/Discount.vue'),
+          component: () => import('@/views/dashboard/management/Discount.vue'),
           meta: {
-            title: 'Discount',
+            title: 'Mã giảm giá',
             requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'domain',
           name: 'domain',
-          component: () => import('@/views/dashboard/examples/service/DomainProduct.vue'),
+          component: () => import('@/views/dashboard/service/DomainProduct.vue'),
           meta: {
-            title: 'Domain',
+            title: 'Tên miền',
             requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'domain-account',
-          name: 'Tài khoản miền',
-          component: () => import('@/views/dashboard/examples/account/DomainAccount.vue'),
+          name: 'Domain Account',
+          component: () => import('@/views/dashboard/account/DomainAccount.vue'),
           meta: {
             title: 'Tài khoản miền',
             requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
@@ -132,9 +133,9 @@ const router = createRouter({
         {
           path: 'customer',
           name: 'Customer',
-          component: () => import('@/views/dashboard/examples/management/Customer.vue'),
+          component: () => import('@/views/dashboard/management/Customer.vue'),
           meta: {
-            title: 'Customer',
+            title: 'Khách hàng',
             requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng','Nhân viên phòng kinh doanh và tiếp thị']
 
           } as RouteMeta & IRouteMeta
@@ -142,18 +143,18 @@ const router = createRouter({
         {
           path: 'customer-type',
           name: 'Customer Type',
-          component: () => import('@/views/dashboard/examples/category/CustomerType.vue'),
+          component: () => import('@/views/dashboard/category/CustomerType.vue'),
           meta: {
-            title: 'Customer Type',
+            title: 'Loại khách hàng',
             requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'order',
           name: 'order',
-          component: () => import('@/views/dashboard/examples/management/Order.vue'),
+          component: () => import('@/views/dashboard/management/Order.vue'),
           meta: {
-            title: 'Order',
+            title: 'Đơn hàng',
             requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
@@ -161,19 +162,19 @@ const router = createRouter({
         {
           path: 'payment-method',
           name: 'Payment Method',
-          component: () => import('@/views/dashboard/examples/management/PaymentMethod.vue'),
+          component: () => import('@/views/dashboard/management/PaymentMethod.vue'),
           meta: {
-            title: 'Payment Method',
-            requiresAuth: true,roles: ['Nhân viên phòng kĩ thuật và hỗ trợ khách hàng']
+            title: 'Phương pháp thanh toán',
+            requiresAuth: true,roles: ['Nhân viên phòng kỹ thuật hỗ trợ khách hàng']
 
           } as RouteMeta & IRouteMeta
         },
         {
           path: 'category',
           name: 'Category',
-          component: () => import('@/views/dashboard/examples/category/Category.vue'),
+          component: () => import('@/views/dashboard/category/Category.vue'),
           meta: {
-            title: 'Category',
+            title: 'Danh mục',
             requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
 
           } as RouteMeta & IRouteMeta
@@ -181,19 +182,11 @@ const router = createRouter({
         {
           path: 'New',
           name: 'New',
-          component: () => import('@/views/dashboard/examples/management/New.vue'),
+          component: () => import('@/views/dashboard/management/New.vue'),
           meta: {
-            title: 'New',
+            title: 'Tin tức',
             requiresAuth: true,roles: ['Nhân viên phòng kinh doanh và tiếp thị']
 
-          } as RouteMeta & IRouteMeta
-        },
-        {
-          path: 'settings',
-          name: 'settings_index',
-          component: () => import('@/views/dashboard/examples/settings/Index.vue'),
-          meta: {
-            title: 'Settings',
           } as RouteMeta & IRouteMeta
         },
       ],

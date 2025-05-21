@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useOrderStore = defineStore('orderStore',() => {
     
 
   const orders = ref<Order[]>([]);
+
+  const appStore = useAppStore();
+  
 
   const getOrders = async () => {
     try {
@@ -15,8 +19,13 @@ export const useOrderStore = defineStore('orderStore',() => {
 
       orders.value = response.data;
 
+      appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -28,11 +37,16 @@ export const useOrderStore = defineStore('orderStore',() => {
 
       await getOrders();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+      appStore.setLoading(false);
+            handleError(error);
+
     }
   }
 
@@ -42,23 +56,67 @@ export const useOrderStore = defineStore('orderStore',() => {
 
       await getOrders();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
 
-  const getStatistic = async(form: Record<string,string>) => {
+  const getTotalRevenue = async(form: Record<string,string>) => {
     try {
-      const response = await axios.post("/order/statistic",form);
+      const response = await axios.post("/order/total_revenue",form);
+
+      appStore.setLoading(false);
+
 
       return response.data;
     } catch (error) {
-      console.log(error);
+
+      appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
+  const getStatistic = async(form: Record<string,string>,status : string) => {
+      try {
+        const response = await axios.post(`/order/statistic?orderStatusEnum=${status}`,form);
 
-  return {getOrders,editOrder,deleteOrder,getStatistic,orders};
+        appStore.setLoading(false);
+
+  
+        return response.data;
+      } catch (error) {
+      appStore.setLoading(false);
+
+              handleError(error);
+;
+      }
+    }
+  
+    const getOverview = async(status : string) => {
+      try {
+        const response = await axios.get(`/order/overview?orderStatusEnum=${status}`);
+
+        appStore.setLoading(false);
+
+  
+        return response.data;
+      } catch (error) {
+
+        appStore.setLoading(false);
+
+              handleError(error);
+;
+      }
+    }
+
+  return {getOrders,editOrder,deleteOrder,getStatistic,getTotalRevenue,getOverview,orders};
 })

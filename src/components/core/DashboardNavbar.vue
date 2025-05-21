@@ -69,18 +69,17 @@ const employeeStore = useEmployeeStore();
           <DropdownMenuSeparator />
           <DropdownMenuItem class="cursor-pointer" @click="router.push(`/dashboard/profile`)">
             <User class="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>Hồ sơ</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem class="cursor-pointer" @click="router.push(`/dashboard/change-password`)">
             <User class="mr-2 h-4 w-4" />
-            <span>Change Password</span>
+            <span>Đổi mật khẩu</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="employeeStore.logoutEmployee()" class="cursor-pointer">
             <LogOut class="mr-2 h-4 w-4" />
-            <span>Log out</span>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+            <span>Đăng xuất</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

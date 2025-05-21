@@ -50,6 +50,8 @@ const onSubmit = handleSubmit(async () =>{
 const tagVariants: StatusType[] = [
   { tag: 'success', title: 'Kích hoạt', value: 'KichHoat' },
   { tag: 'warning', title: 'Chờ xác thực', value: 'ChoXacThuc' },
+  { tag: 'destructive', title: 'Khóa', value: 'Khoa' },
+
 ];
 
 const editMode = ref(false);
@@ -151,6 +153,7 @@ onMounted(async () => {
                     <SelectGroup>
                       <SelectItem value="ChoXacThuc">Chờ xác thực</SelectItem>
                       <SelectItem value="KichHoat">Kích hoạt</SelectItem>
+                      <SelectItem value="Khoa">Khóa</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -181,6 +184,6 @@ onMounted(async () => {
       <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
-    <DataTable :columns="columns" :data="store.employees"></DataTable>
+    <DataTable :columns="columns" :data="store.employees" search="name"></DataTable>
   </div>
 </template>

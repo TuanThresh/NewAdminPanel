@@ -5,7 +5,8 @@ interface IAppStore {
   sidebarExpand: boolean
   wrapperWidth: number | string
   wrapperLeftOffset: number | string
-  navWidth: number | string
+  navWidth: number | string,
+  loading: boolean
 }
 
 const LIGHT = 'light';
@@ -14,18 +15,21 @@ const THEME_KEY = 'themeMode';
 const EXPAND = 280;
 const SHRINKED = 72;
 
+
 export const useAppStore = defineStore('app', {
   state: () => <IAppStore>({
     themeMode: LIGHT,
     sidebarExpand: true,
     wrapperWidth: 0,
     wrapperLeftOffset: 0,
-    navWidth: '100%'
+    navWidth: '100%',
+    loading: false
   }),
   getters: {
     theme: (state) => state.themeMode,
     isDark: (state) => state.themeMode === DARK,
     sidebarExpanded: (state) => state.sidebarExpand,
+    isloading: (state) => state.loading
   },
   actions: {
     toggleSidebar() {
@@ -74,5 +78,8 @@ export const useAppStore = defineStore('app', {
       document.documentElement.classList.add(this.themeMode);
       document.body.classList.add(this.themeMode);
     },
+    setLoading(value : boolean) {
+      this.loading = value;
+    }
   },
 });

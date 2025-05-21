@@ -3,17 +3,23 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useAuthorizeStore = defineStore('authorizeStore',() => {
     
   const authorizes = ref<Authorize[]>([]);
 
+              const appStore = useAppStore();
+  
 
   const getAuthorizes = async () => {
     try {
       const response = await axios.get<Authorize[]>("/authorize") as APIResponse<Authorize[]>;
 
       authorizes.value = response.data;
+
+        appStore.setLoading(false);
+
 
       return response.data;
     } catch (error) {
@@ -28,11 +34,15 @@ export const useAuthorizeStore = defineStore('authorizeStore',() => {
 
       await getAuthorizes();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+      handleError(error);
+
     }
   }
 
@@ -44,11 +54,14 @@ export const useAuthorizeStore = defineStore('authorizeStore',() => {
 
       await getAuthorizes();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error);
+      handleError(error);
     }
   }
 

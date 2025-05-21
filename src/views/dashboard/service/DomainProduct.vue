@@ -25,7 +25,6 @@ const formSchema = toTypedSchema(z.object({
   domainName: z.string().min(1,{
     message : "Tên miền không được để trống"
   }).default(""),
-  priceStart: z.number(),
   domainType: z.string().min(1,{
     message : "Loại miền không được để trống"
   }).default("VietName"),
@@ -61,7 +60,6 @@ onMounted(async () => {
 const columns: ColumnDef<DomainProduct>[] = [
   { accessorKey: 'id', header: 'Mã miền', enableSorting: false },
   { accessorKey: 'domainName', header: 'Tên miền', enableSorting: false },
-  { accessorKey: 'priceStart', header: 'Giá khởi điểm', enableSorting: false },
   { accessorKey: 'domainType', header: 'Loại miền', enableSorting: false },
   {
     accessorKey: 'action',
@@ -103,17 +101,7 @@ const columns: ColumnDef<DomainProduct>[] = [
               </FormItem>
           </FormField>
       </div>
-      <div class="grid gap-y-2">
-        <FormField v-slot="{ componentField }" name="priceStart">
-            <FormItem class="mb-4">
-              <FormLabel>Giá khởi điểm</FormLabel>
-              <FormControl>
-                <Input type="number" placeholder="Giá khởi điểm" v-bind="componentField" />
-              </FormControl>
-              <FormMessage />
-              </FormItem>
-          </FormField>
-      </div>
+      
       <div class="grid gap-y-2">
         <FormField v-slot="{ componentField }" name="price">
             <FormItem class="mb-4">
@@ -147,7 +135,8 @@ const columns: ColumnDef<DomainProduct>[] = [
               </FormItem>
           </FormField>
       </div>
-      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <div></div>
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm miền" }}</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.domainProducts"></DataTable>

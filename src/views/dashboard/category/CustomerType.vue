@@ -101,7 +101,7 @@ const columns: ColumnDef<CustomerType>[] = [
               </FormItem>
           </FormField>
       </div>
-      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm nhân viên" }}</Button>
+      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm loại khách hàng" }}</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.customerTypes"></DataTable>

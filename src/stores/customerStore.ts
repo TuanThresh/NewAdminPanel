@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useCustomerStore = defineStore('customerStore',() => {
     
 
   const customers = ref<Customer[]>([]);
+
+            const appStore = useAppStore();
+  
 
   const getCustomers = async () => {
     try {
@@ -15,8 +19,14 @@ export const useCustomerStore = defineStore('customerStore',() => {
 
       customers.value = response.data;
 
+        appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -28,11 +38,17 @@ export const useCustomerStore = defineStore('customerStore',() => {
 
       await getCustomers();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -41,13 +57,19 @@ export const useCustomerStore = defineStore('customerStore',() => {
     try {
       const response = await axios.put(`/customer/${id}`,dataWithoutId)
 
+        appStore.setLoading(false);
+
+
       await getCustomers();
 
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -55,24 +77,54 @@ export const useCustomerStore = defineStore('customerStore',() => {
     try {
       const response = await axios.delete(`/customer/${id}`)
 
+        appStore.setLoading(false);
+
+
       await getCustomers();
 
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      handleError(error);
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
-  const getStatistic = async(form: Record<string,string>) => {
-      try {
-        const response = await axios.post("/customer/statistic",form);
-  
-        return response.data;
-      } catch (error) {
-        console.log(error);
-      }
+  const getStatistic = async(form: Record<string,string>,status : string) => {
+    try {
+      const response = await axios.post(`/customer/statistic?customerTypeId=${status}`,form);
+
+        appStore.setLoading(false);
+
+
+      return response.data;
+    } catch (error) {
+
+        appStore.setLoading(false);
+
+            handleError(error);
+
+    }
   }
 
-  return {getCustomers,addCustomer,editCustomer,deleteCustomer,getStatistic,customers};
+  const getOverview = async(status : string) => {
+    try {
+      const response = await axios.get(`/customer/overview?customerTypeId=${status}`);
+
+        appStore.setLoading(false);
+
+
+      return response.data;
+    } catch (error) {
+
+        appStore.setLoading(false);
+
+            handleError(error);
+
+    }
+  }
+
+  return {getCustomers,addCustomer,editCustomer,deleteCustomer,getStatistic,getOverview,customers};
 })

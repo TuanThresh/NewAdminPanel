@@ -1,4 +1,4 @@
-import DomainAccount from "@/views/dashboard/examples/account/DomainAccount.vue";
+
 
 export interface Employee{
     id : string,
@@ -55,7 +55,6 @@ export interface CustomerType{
 export interface DomainProduct{
     id: string,
     domainName: string,
-    priceStart: number,
     domainType: string,
     price: number
 }

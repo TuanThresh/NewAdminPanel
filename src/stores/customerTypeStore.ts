@@ -3,20 +3,31 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useCustomerTypeStore = defineStore('customerTypeStore',() => {
     
 
   const customerTypes = ref<CustomerType[]>([]);
 
+          const appStore = useAppStore();
+  
+
   const getCustomerTypes = async () => {
     try {
       const response = await axios.get<CustomerType[]>("/customer_type") as APIResponse<CustomerType[]>;
+
+        appStore.setLoading(false);
+
+      
 
       customerTypes.value = response.data;
 
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -28,11 +39,18 @@ export const useCustomerTypeStore = defineStore('customerTypeStore',() => {
 
       await getCustomerTypes();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+
+        appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
@@ -43,11 +61,19 @@ export const useCustomerTypeStore = defineStore('customerTypeStore',() => {
 
       await getCustomerTypes();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+
+
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -57,10 +83,16 @@ export const useCustomerTypeStore = defineStore('customerTypeStore',() => {
 
       await getCustomerTypes();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }

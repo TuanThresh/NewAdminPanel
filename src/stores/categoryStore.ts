@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const useCategoryStore = defineStore('CategoryStore',() => {
     
 
   const categories = ref<Category[]>([]);
+
+            const appStore = useAppStore();
+  
 
   const getCategories = async () => {
     try {
@@ -15,8 +19,14 @@ export const useCategoryStore = defineStore('CategoryStore',() => {
 
       categories.value = response.data;
 
+        appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+
+        appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -28,11 +38,18 @@ export const useCategoryStore = defineStore('CategoryStore',() => {
 
       await getCategories();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -43,11 +60,18 @@ export const useCategoryStore = defineStore('CategoryStore',() => {
 
       await getCategories();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+
+        appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -57,11 +81,19 @@ export const useCategoryStore = defineStore('CategoryStore',() => {
 
       await getCategories();
 
+        appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      handleError(error);
+
+        appStore.setLoading(false);
+
+      
+            handleError(error);
+
     }
   }
 

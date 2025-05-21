@@ -47,6 +47,7 @@ const {handleSubmit, values, setValues } = useForm(
   }
 );
 const customerTypeStore = useCustomerTypeStore();
+
 const editMode = ref(false);
 
 const store = useCustomerStore();
@@ -68,6 +69,7 @@ const onSubmit = handleSubmit(async () =>{
 onMounted(async () => {
   await customerTypeStore.getCustomerTypes();
   await store.getCustomers();
+
 })
 
 const columns: ColumnDef<Customer>[] = [

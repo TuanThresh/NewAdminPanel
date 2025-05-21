@@ -3,11 +3,15 @@ import { defineStore } from "pinia";
 import axios from "@/plugins/axios";
 import { ref } from "vue";
 import { handleError, handleSucess } from "@/lib/utils";
+import { useAppStore } from "./app";
 
 export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
     
 
   const paymentMethods = ref<PaymentMethod[]>([]);
+
+    const appStore = useAppStore();
+  
 
 
   const getPaymentMethods = async () => {
@@ -16,8 +20,14 @@ export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
 
       paymentMethods.value = response.data;
 
+      appStore.setLoading(false);
+
+
       return response.data;
     } catch (error) {
+
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
@@ -29,11 +39,17 @@ export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
 
       await getPaymentMethods();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data
     } catch (error) {
-      console.log(error);
+      appStore.setLoading(false);
+
+            handleError(error);
+;
     }
   }
 
@@ -44,11 +60,17 @@ export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
 
       await getPaymentMethods();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
-      console.log(error)
+      appStore.setLoading(false);
+
+            handleError(error);
+
     }
   }
 
@@ -58,10 +80,15 @@ export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
 
       await getPaymentMethods();
 
+      appStore.setLoading(false);
+
+
       handleSucess(response.status.toString(),response.data)
 
       return response.data;
     } catch (error) {
+      appStore.setLoading(false);
+
       handleError(error);
     }
   }
