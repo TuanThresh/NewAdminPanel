@@ -65,9 +65,9 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
     }
   }
 
-  const getEmployees = async () => {
+  const getEmployees = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Employee[]>("/employee") as APIResponse<Employee[]>;
+      const response = await axios.get<Employee[]>(`/employee?currentPage=${currentPage}`) as APIResponse<Employee[]>;
 
       employees.value = response.data;
 
@@ -76,6 +76,8 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
       return response.data;
     } catch (error) {
       appStore.setLoading(false);
+
+      // console.log(error);
 
       handleError(error);
     }
@@ -114,6 +116,8 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
     } catch (error) {
 
       appStore.setLoading(false);
+
+      console.log(error);
 
             handleError(error);
 ;

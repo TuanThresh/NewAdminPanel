@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,14 @@ import { useDiscountStore } from '@/stores/discountStore';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useAppStore } from '@/stores/app';
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useRoute } from 'vue-router';
 const formSchema = toTypedSchema(z.object({
   percentage: z.number().default(0),
   discountCode: z.string().min(1,{
@@ -59,9 +66,24 @@ const onSubmit = handleSubmit(async () =>{
   else await store.addDiscount(values);
 })
 
+const currentPage = ref(1);
+
+watch(currentPage,async (value) => {
+  await store.getDiscounts(value.toString());
+
+  appStore.setPagination();
+
+})
+
 onMounted(async () => {
-  await customerTypeStore.getCustomerTypes();
-  await store.getDiscounts();
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+
+  await customerTypeStore.getCustomerTypes("-1");
+  await store.getDiscounts(currentPage.value.toString());
+
+  appStore.setPagination();
+
 })
 
 const columns: ColumnDef<Discount>[] = [
@@ -160,5 +182,24 @@ const columns: ColumnDef<Discount>[] = [
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.discounts"></DataTable>
+    <Pagination :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="(index + 1) == currentPage"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

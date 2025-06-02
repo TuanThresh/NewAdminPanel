@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,15 @@ import * as z from 'zod';
 import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
 import type { DomainProduct } from "@/interfaces/index";
 import { useDomainProductStore } from '@/stores/domainProductStore';
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useAppStore } from '@/stores/app';
+import { useRoute } from 'vue-router';
 
 
 const formSchema = toTypedSchema(z.object({
@@ -37,6 +45,9 @@ const {handleSubmit, values, setValues } = useForm(
   }
 );
 const store = useDomainProductStore();
+
+const appStore = useAppStore();
+
 const editMode = ref(false);
 
 const defaultValues = {...values};
@@ -53,8 +64,23 @@ const onSubmit = handleSubmit(async () =>{
   else await store.addDomainProduct(values);
 })
 
+const currentPage = ref(1);
+
+watch(currentPage,async (value) => {
+  await store.getDomainProducts(value.toString());
+
+  appStore.setPagination();
+
+})
+
 onMounted(async () => {
-  await store.getDomainProducts();
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+
+  await store.getDomainProducts(currentPage.value.toString());
+
+  appStore.setPagination();
+
 })
 
 const columns: ColumnDef<DomainProduct>[] = [
@@ -140,5 +166,24 @@ const columns: ColumnDef<DomainProduct>[] = [
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
     </form>
     <DataTable :columns="columns" :data="store.domainProducts"></DataTable>
+    <Pagination :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="(index + 1) == currentPage"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

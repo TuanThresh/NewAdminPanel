@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,15 @@ import type {  New } from "@/interfaces/index";
 import '@vuepic/vue-datepicker/dist/main.css'
 import { useNewStore } from '@/stores/newStore';
 import { useCategoryStore } from '@/stores/categoryStore';
-
+import { useAppStore } from '@/stores/app';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useRoute } from 'vue-router';
 const formSchema = toTypedSchema(z.object({
   id: z.string().optional(),
     title: z.string().min(1,{
@@ -47,6 +55,8 @@ const editMode = ref(false);
 
 const store = useNewStore();
 
+const appStore = useAppStore();
+
 const categoryStore = useCategoryStore();
 
 const defaultValues = {...values};
@@ -72,13 +82,27 @@ const onSubmit = handleSubmit(async () =>{
   else await store.addNew(formData);
 })
 
-onMounted(async () => {
-  await categoryStore.getCategories();
-  categoryStore.categories.forEach(element => {
-    console.log(element);
-  });
-  await store.getNews();
+const currentPage = ref(1);
+
+watch(currentPage,async (value) => {
+  await store.getNews(value.toString());
+
+  appStore.setPagination();
+
 })
+
+onMounted(async () => {
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+
+  await categoryStore.getCategories("-1");
+  
+  await store.getNews(currentPage.value.toString());
+
+  appStore.setPagination();
+
+})
+
 
 const columns: ColumnDef<New>[] = [
   { accessorKey: 'id', header: 'Mã tin tức', enableSorting: false },
@@ -177,5 +201,24 @@ const columns: ColumnDef<New>[] = [
 
     </form>
     <DataTable :columns="columns" :data="store.news"></DataTable>
+    <Pagination :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="(index + 1) == currentPage"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

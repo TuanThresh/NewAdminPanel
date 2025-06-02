@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,15 @@ import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/compo
 import type { Customer } from "@/interfaces/index";
 import { useCustomerStore } from '@/stores/customerStore';
 import { useCustomerTypeStore } from '@/stores/customerTypeStore';
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useAppStore } from '@/stores/app';
+import { useRoute } from 'vue-router';
 
 const formSchema = toTypedSchema(z.object({
   email: z.string().min(1,{
@@ -52,7 +60,10 @@ const editMode = ref(false);
 
 const store = useCustomerStore();
 
+const appStore = useAppStore();
+
 const defaultValues = {...values};
+
 
 const clearForm = () => {
   editMode.value = false;
@@ -60,21 +71,35 @@ const clearForm = () => {
 }
 
 const onSubmit = handleSubmit(async () =>{
-  if(editMode.value){
-    await store.editCustomer(values)
-  }
-  else await store.addCustomer(values);
+  store.editCustomer(values)
+})
+
+const currentPage = ref(1);
+
+watch(currentPage,async (value) => {
+  await store.getCustomers(value.toString());
+
+  appStore.setPagination();
+
 })
 
 onMounted(async () => {
-  await customerTypeStore.getCustomerTypes();
-  await store.getCustomers();
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+
+  await customerTypeStore.getCustomerTypes("-1");
+  
+  await store.getCustomers(currentPage.value.toString());
+
+  appStore.setPagination();
+
 
 })
 
 const columns: ColumnDef<Customer>[] = [
   { accessorKey: 'id', header: 'Mã khách hàng', enableSorting: false },
   { accessorKey: 'name', header: 'Tên khách hàng', enableSorting: false },
+  { accessorKey: 'hasType', header: 'Loại khách hàng', enableSorting: false },
   { accessorKey: 'phoneNumber', header: 'Số điện thoại', enableSorting: false },
   { accessorKey: 'email', header: 'Email', enableSorting: false },
   { accessorKey: 'address', header: 'Địa chỉ', enableSorting: false },
@@ -172,10 +197,29 @@ const columns: ColumnDef<Customer>[] = [
           </FormField>
       </div>
       <div></div>
-      <Button type="submit">{{editMode ? "Cập nhật" : "Thêm khách hàng" }}</Button>
+      <Button type="submit" v-if="editMode">Cập nhật</Button>
       <Button v-if="editMode" @click="clearForm">Hủy</Button>
 
     </form>
     <DataTable :columns="columns" :data="store.customers" search="name"></DataTable>
+    <Pagination :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="(index + 1) == currentPage"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

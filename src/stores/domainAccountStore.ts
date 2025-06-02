@@ -13,9 +13,9 @@ export const useDomainAccountStore = defineStore('domainAccountStore',() => {
       const appStore = useAppStore();
   
 
-  const getDomainAccounts = async () => {
+  const getDomainAccounts = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<DomainAccount[]>("/domain_account") as APIResponse<DomainAccount[]>;
+      const response = await axios.get<DomainAccount[]>(`/domain_account?currentPage=${currentPage}`) as APIResponse<DomainAccount[]>;
 
       domainAccounts.value = response.data;
 

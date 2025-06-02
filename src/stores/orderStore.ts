@@ -13,9 +13,9 @@ export const useOrderStore = defineStore('orderStore',() => {
   const appStore = useAppStore();
   
 
-  const getOrders = async () => {
+  const getOrders = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Order[]>("/order") as APIResponse<Order[]>;
+      const response = await axios.get<Order[]>(`/order?currentPage=${currentPage}`) as APIResponse<Order[]>;
 
       orders.value = response.data;
 

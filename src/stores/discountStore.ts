@@ -13,9 +13,9 @@ export const useDiscountStore = defineStore('discountStore',() => {
         const appStore = useAppStore();
   
 
-  const getDiscounts = async () => {
+  const getDiscounts = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Discount[]>("/discount") as APIResponse<Discount[]>;
+      const response = await axios.get<Discount[]>(`/discount?currentPage=${currentPage}`) as APIResponse<Discount[]>;
 
       discounts.value = response.data;
 

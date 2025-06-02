@@ -12,9 +12,9 @@ export const useAuthorizeStore = defineStore('authorizeStore',() => {
               const appStore = useAppStore();
   
 
-  const getAuthorizes = async () => {
+  const getAuthorizes = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Authorize[]>("/authorize") as APIResponse<Authorize[]>;
+      const response = await axios.get<Authorize[]>(`/authorize?currentPage=${currentPage}`) as APIResponse<Authorize[]>;
 
       authorizes.value = response.data;
 

@@ -101,3 +101,10 @@ export interface New{
     content: string,
     imageUrl: string,
 }
+
+export interface PaginationInterface{
+    totalCount: number,
+    totalPages: number,
+    currentPage: number,
+    pageSize: number
+}

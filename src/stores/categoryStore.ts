@@ -13,14 +13,13 @@ export const useCategoryStore = defineStore('CategoryStore',() => {
             const appStore = useAppStore();
   
 
-  const getCategories = async () => {
+  const getCategories = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Category[]>("/category") as APIResponse<Category[]>;
+      const response = await axios.get<Category[]>(`/category?currentPage=${currentPage}`) as APIResponse<Category[]>;
 
       categories.value = response.data;
 
         appStore.setLoading(false);
-
 
       return response.data;
     } catch (error) {

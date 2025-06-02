@@ -13,9 +13,9 @@ export const useCustomerStore = defineStore('customerStore',() => {
             const appStore = useAppStore();
   
 
-  const getCustomers = async () => {
+  const getCustomers = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<Customer[]>("/customer") as APIResponse<Customer[]>;
+      const response = await axios.get<Customer[]>(`/customer?currentPage=${currentPage}`) as APIResponse<Customer[]>;
 
       customers.value = response.data;
 
@@ -27,7 +27,7 @@ export const useCustomerStore = defineStore('customerStore',() => {
 
         appStore.setLoading(false);
 
-      handleError(error);
+      console.log(error)
     }
   }
   

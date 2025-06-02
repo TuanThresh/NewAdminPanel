@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import Button from '@/components/ui/button/Button.vue';
@@ -19,19 +19,35 @@ import * as z from 'zod';
 import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
 import { useAuthorizeStore } from '@/stores/authorizeStore';
 import { useRoleStore } from '@/stores/roleStore';
-
+import { useAppStore } from '@/stores/app';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useRoute } from 'vue-router';
 const store = useAuthorizeStore();
+
+const appStore = useAppStore();
 
 const roleStore = useRoleStore();
 
 
 
 onMounted(async () => {
-  await roleStore.getRoles();
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+  
+  await roleStore.getRoles("-1");
   setValues({
     roleId: roleStore.roles[0].id.toString()
   })
-  await store.getAuthorizes();
+  await store.getAuthorizes(currentPage.value.toString());
+
+  appStore.setPagination();
+
 });
 const formSchema = toTypedSchema(z.object({
   employeeId : z.string().min(1,{
@@ -51,7 +67,17 @@ const onSubmit = handleSubmit(async () =>{
   await store.authorize(values);
 })
 
+const currentPage = ref(1);
 
+watch(currentPage,async (value) => {
+
+  
+
+  await store.getAuthorizes(value.toString());
+
+  appStore.setPagination();
+
+})
 
 const columns: ColumnDef<Authorize>[] = [
   { accessorKey: 'id', header: 'Mã phân quyền' }, 
@@ -116,5 +142,24 @@ const columns: ColumnDef<Authorize>[] = [
       </form>
 
     <DataTable :columns="columns" :data="store.authorizes"></DataTable>
+    <Pagination :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="(index + 1) == currentPage"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

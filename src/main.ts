@@ -11,10 +11,12 @@ import 'notivue/animations.css'
 
 import App from './App.vue'
 import router from './router'
+
 const notivue = createNotivue({
     position: "bottom-right"
 })
 const app = createApp(App)
+
 app.component('VueDatePicker', VueDatePicker);
 app.component('PageHeader', PageHeaderVue);
 app.component('Icon', Icon);

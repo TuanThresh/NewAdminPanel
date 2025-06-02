@@ -1,4 +1,6 @@
+import type { PaginationInterface } from '@/interfaces';
 import { defineStore } from 'pinia';
+import router from '@/router';
 
 interface IAppStore {
   themeMode: 'light' | 'dark'
@@ -6,7 +8,8 @@ interface IAppStore {
   wrapperWidth: number | string
   wrapperLeftOffset: number | string
   navWidth: number | string,
-  loading: boolean
+  loading: boolean,
+  pagination: PaginationInterface | null
 }
 
 const LIGHT = 'light';
@@ -14,6 +17,7 @@ const DARK = 'dark';
 const THEME_KEY = 'themeMode';
 const EXPAND = 280;
 const SHRINKED = 72;
+let json = localStorage.getItem("pagination");
 
 
 export const useAppStore = defineStore('app', {
@@ -23,13 +27,15 @@ export const useAppStore = defineStore('app', {
     wrapperWidth: 0,
     wrapperLeftOffset: 0,
     navWidth: '100%',
-    loading: false
+    loading: false,
+    pagination: json ? JSON.parse(json) as PaginationInterface : null
   }),
   getters: {
     theme: (state) => state.themeMode,
     isDark: (state) => state.themeMode === DARK,
     sidebarExpanded: (state) => state.sidebarExpand,
-    isloading: (state) => state.loading
+    isloading: (state) => state.loading,
+    paginationGetter: (state) => state.pagination
   },
   actions: {
     toggleSidebar() {
@@ -80,6 +86,14 @@ export const useAppStore = defineStore('app', {
     },
     setLoading(value : boolean) {
       this.loading = value;
+    },
+    setPagination(){
+
+      json = localStorage.getItem("pagination");
+
+      this.pagination = json ? JSON.parse(json) as PaginationInterface : null
+
+      router.push({query: {currentPage : this.paginationGetter?.currentPage ?? 1}})
     }
   },
 });

@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue';
+import { ref, h, onMounted, watch } from 'vue';
 import { DataTable, type ColumnDef } from '@/components/ui/data-table';
 import Button from '@/components/ui/button/Button.vue';
 import { Input } from '@/components/ui/input';
-import type { Role } from '@/interfaces';
+import type { PaginationInterface, Role } from '@/interfaces';
 import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { FormControl, FormField, FormLabel, FormItem,FormMessage } from '@/components/ui/form';
 import { useRoleStore } from '@/stores/roleStore';
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
+import { useAppStore } from '@/stores/app';
+import { useRoute } from 'vue-router';
 const store = useRoleStore();
+const appStore = useAppStore();
 
 const formSchema = toTypedSchema(z.object({
   roleName: z.string().min(1,{
@@ -25,10 +34,25 @@ const {handleSubmit, values, setValues } = useForm(
 );
 const editMode = ref(false);
 
+const currentPage = ref(1);
+
+watch(currentPage,async (value) => {
+  await store.getRoles(value.toString());
+
+  appStore.setPagination();
+
+})
+
 
 
 onMounted(async() => {
+
+  currentPage.value = (useRoute().query.currentPage?.toString() ?? 1) as number ;
+
   await store.getRoles();
+
+  appStore.setPagination();
+
 })
 
 const onSubmit = handleSubmit(async () =>{
@@ -44,7 +68,7 @@ const clearForm = () => {
   setValues({...defaultValues})
 }
 
-// 🔹 Cấu hình cột cho DataTable
+
 const columns: ColumnDef<Role>[] = [
   { accessorKey: 'id', header: 'Mã Quyền' },
   { accessorKey: 'roleName', header: 'Tên Quyền' },
@@ -89,5 +113,24 @@ const columns: ColumnDef<Role>[] = [
       </form>
 
     <DataTable :columns="columns" :data="store.roles"></DataTable>
+    <Pagination v-slot="{ page }" :items-per-page="appStore.paginationGetter?.pageSize || 10" :total="appStore.paginationGetter?.totalCount" :default-page="1" class="mt-5" v-if="appStore.paginationGetter">
+      <PaginationContent v-slot="{ items }">
+        <PaginationPrevious @click="currentPage --" />
+        <template v-for="(item, index) in items" :key="index">
+          
+          <PaginationItem
+            v-if="item.type === 'page'"
+            :value="item.value"
+            :is-active="item.value === page"
+            @click="currentPage = item.value"
+          >
+            {{ item.value }}
+          </PaginationItem>
+          
+        </template>
+        <PaginationNext @click="currentPage ++"/>
+        
+      </PaginationContent>
+    </Pagination>
   </div>
 </template>

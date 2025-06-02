@@ -12,9 +12,9 @@ export const useNewStore = defineStore('NewStore',() => {
 
   const news = ref<New[]>([]);
 
-  const getNews = async () => {
+  const getNews = async (currentPage : string = "1") => {
     try {
-      const response = await axios.get<New[]>("/new") as APIResponse<New[]>;
+      const response = await axios.get<New[]>(`/new?currentPage=${currentPage}`) as APIResponse<New[]>;
 
       news.value = response.data;
 

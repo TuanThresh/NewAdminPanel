@@ -3,14 +3,18 @@
   "style": "new-york",
   "typescript": true,
   "tailwind": {
-    "config": "config/tailwind.config.js",
-    "css": "src/assets/index.css",
+    "config": "tailwind.config.ts",
+    "css": "src/assets/css/index.css",
     "baseColor": "neutral",
-    "cssVariables": true
+    "cssVariables": true,
+    "prefix": ""
   },
-  "framework": "vite",
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/utils"
-  }
+    "composables": "@/composables",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib"
+  },
+  "iconLibrary": "lucide"
 }
