@@ -230,7 +230,7 @@ router.beforeEach((to,from,next) => {
     return next();
   }
   else if(!to.meta.requiresAuth && user) return next(from);
-  document.title = to.meta.title as string || "Default Title";
+  // document.title = to.meta.title as string || "Default Title";
 
   next();
 })

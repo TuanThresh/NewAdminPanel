@@ -11,7 +11,13 @@ import type { Customer, CustomerType } from "@/interfaces/index";
 import { useCustomerTypeStore } from '@/stores/customerTypeStore';
 import { useAppStore } from '@/stores/app';
 import { useRoute } from 'vue-router';
-
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 
 const formSchema = toTypedSchema(z.object({
   typeName: z.string().min(1,{

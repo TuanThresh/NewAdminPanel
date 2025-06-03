@@ -18,6 +18,8 @@ export const usePaymentMethodStore = defineStore('PaymentMethodStore',() => {
     try {
       const response = await axios.get<PaymentMethod[]>(`/payment_method?currentPage=${currentPage}`) as APIResponse<PaymentMethod[]>;
 
+      console.log(response);
+
       paymentMethods.value = response.data;
 
       appStore.setLoading(false);

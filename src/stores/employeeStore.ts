@@ -35,10 +35,6 @@ export const useEmployeeStore = defineStore('employeeStore',() => {
       return response.data;
 
     } catch (error) {
-
-            handleError(error);
-;
-
       router.replace({name : "login"});
 
       appStore.setLoading(false);
